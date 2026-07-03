@@ -1,0 +1,12 @@
+{
+  "name": "peek-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Peek — a multi-agent competitive intelligence demo (Scout -> Writer -> Critic -> Reviser).",
+  "scripts": {
+    "build:prompts": "node scripts/build-prompts.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
