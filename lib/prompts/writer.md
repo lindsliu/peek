@@ -53,7 +53,9 @@ Write one focused paragraph of prose (not a bulleted list) that a leadership tea
 
 Every fact you lean on must carry its `[N]` citation. You may exercise strategic judgment about what WE should do — that is the purpose of this section — but you may not invent facts about the competitor to justify it. Avoid hedged platitudes like "worth monitoring" or "keep an eye on."
 
-**Critical — build the recommendation only from facts this brief already establishes.** The threat, opening, move, and trigger must each rest on something already stated and cited above (in Positioning, Pricing, Key Features, Recent Moves, or Gaps). Do NOT introduce any new specific the sources don't contain — no named certifications (e.g. SOC 2, HIPAA, SSO), features, prices, customer segments, or integrations — just because they'd make a tidy strategic hook. This is the single most common place the pipeline invents plausible-sounding facts. If the research documents a compliance gap, a pricing lever, or a feature wedge, use it; if it doesn't, make the strategic point at the level the sources actually support rather than reaching for a concrete detail that isn't there.}
+**Critical — build the recommendation only from facts this brief already establishes.** The threat, opening, move, and trigger must each rest on something already stated and cited above (in Positioning, Pricing, Key Features, Recent Moves, or Gaps). Do NOT introduce any new specific the sources don't contain — no named certifications (e.g. SOC 2, HIPAA, SSO), features, prices, customer segments, or integrations — just because they'd make a tidy strategic hook. This is the single most common place the pipeline invents plausible-sounding facts. If the research documents a compliance gap, a pricing lever, or a feature wedge, use it; if it doesn't, make the strategic point at the level the sources actually support rather than reaching for a concrete detail that isn't there.
+
+**Pressure-test the opening against the competitor's own moves.** Before you name an opening — or a "they haven't done X yet" watch-trigger — check it against the Key Features and Recent Moves you wrote above. If the competitor is *already* addressing that gap (a recent launch, acquisition, pricing change, or product aimed at it), the opening is contested or closing, not open. Say so honestly: either pick a wedge the competitor is NOT already pursuing, or frame the opening as narrowing and note how fast it's closing. NEVER claim the competitor is ignoring a segment or capability that this brief's own Key Features or Recent Moves show them moving into — e.g. do not call a low-end segment an untapped opening if you just listed a low-cost product they launched for that exact segment. A recommendation that a well-informed employee of the competitor would immediately laugh off is a failed recommendation.}
 ```
 
 ## Citation rules
@@ -116,6 +118,7 @@ Before producing your output, verify:
 - Every claim has a `[N]` citation (except in TL;DR)
 - No source number is invented — every `[N]` you use maps to a source in the Scout's notes
 - No comparative, exclusivity, or causal claim is stated as fact without a source that says it (rule 7)
+- Every opening and watch-trigger in the Recommendation is consistent with the Key Features and Recent Moves above — I have not called something an untapped opening that the brief shows the competitor already pursuing
 - The Recommendation is specific enough to be acted on
 - Disagreements between sources are surfaced, not hidden
 - Missing information is acknowledged rather than fabricated
