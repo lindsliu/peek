@@ -25,6 +25,7 @@ Any claim in `draft.md` that is not supported by a source in `scout_notes.md`. B
 - **Compound claim drift** — half a claim is in the source, the other half isn't. The citation covers the supported half.
 - **Confident extrapolation** — Writer states a fact more strongly than the source supports. The source says "one user reports lag with 5000+ records"; the draft says "the product struggles with databases over 5000 records."
 - **Cross-source contradiction** — claims that look consistent with one cited source but contradict another cited source (or another source available in scout_notes.md that wasn't cited). When sources disagree on dates, scope, numbers, or named entities, Writer should surface the disagreement explicitly. A claim that silently resolves a source disagreement is a faithfulness violation even if every cited source individually supports a piece of it.
+- **Unsourced inference stated as fact** — comparative, exclusivity, causal, or market-structure claims that read like facts but no source supports: "proprietary to X," "the only tool that…," "competitors haven't matched," "first to," "creates lock-in," "introduces integration complexity," "drove growth," "structural advantage." Check each one against the sources. If no source in `scout_notes.md` states it — even if it carries a `[N]` — flag it. The Fix is to cite a source that genuinely supports it, relabel it as explicit analyst inference, or cut it. Be especially suspicious of adjectives of uniqueness ("proprietary," "unique," "only") and of cause-and-effect claims.
 
 For every claim with a citation, cross-reference: does source `[N]` in `scout_notes.md` actually contain this exact claim?
 
@@ -44,15 +45,17 @@ Vague claims that should be concrete given what's in `scout_notes.md`. If the so
 
 ### 4. Recommendation weakness
 
-The Recommendation section should propose a specific action. Flag it as weak if it:
+The Recommendation is written for a PM analyzing this company as a potential competitor while preparing a market-entry strategy for their own leadership. It must answer "given what this competitor is doing, what should WE do, and what threatens our entry?" — NOT "should we buy this product." Flag it as weak if it:
 
-- Uses vague verbs without concrete commitments ("consider," "explore," "monitor," "watch closely")
-- Lacks a timeframe (no Q-date, no week count, no calendar reference)
-- Lacks success criteria (no measurable test for whether the action worked)
-- Lacks named tests, teams, or specifics
-- Hedges so broadly that no action follows from it
+- Only re-describes the competitor without saying what it means for our entry or what we should do.
+- Gives no threat read — doesn't say how much of a threat the competitor is to our entry, or why.
+- Proposes no concrete strategic move a leadership team could act on (target segment, positioning, what to build or price, where to differentiate).
+- Uses vague verbs with no commitment ("consider," "explore," "monitor," "watch closely") instead of a specific move or a named watch-trigger ("if they ship X, do Y").
+- Recommends piloting, adopting, or buying the competitor — that's the wrong frame for this reader.
+- **Introduces new specifics that aren't in the sources** — named certifications (SOC 2, HIPAA, SSO), features, prices, customer segments, or integrations that appear nowhere in `scout_notes.md`. The Recommendation is the single most common place this happens: the strategic framing tempts the Writer to reach for a concrete-sounding hook it never established. Check every concrete noun in the Recommendation against the sources; if it's not there, flag it, and the Fix is to cut the invented specific or rebuild the point from a fact the brief actually cites.
+- Leans on facts that aren't cited, or invents competitor facts to justify the strategy.
 
-A recommendation that says "consider piloting" fails. A recommendation that says "run a 4-week pilot with 2 engineering teams by end of Q3, measuring throughput against current workflow, expand if results show ≥15% improvement" passes.
+A recommendation that says "monitor Product X closely" fails. One that says "their enterprise gap — no SSO or SOC 2 [12] — is our opening; enter enterprise-first with compliance-forward positioning, and treat a SOC 2 announcement [12] as the signal to accelerate" passes.
 
 ## What not to look for
 

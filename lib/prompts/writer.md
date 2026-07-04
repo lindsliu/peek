@@ -18,7 +18,7 @@ A markdown document with this exact structure. Every section is required.
 ```
 # {Product Name} — Competitive One-Pager
 
-**Date:** {today's date in YYYY-MM-DD}
+**As of:** {the most recent source date in the Scout's notes, in YYYY-MM-DD — do NOT use today's date and do NOT invent one; if no source gives a date, write "date not specified in sources"}
 **Sources reviewed:** {count}
 
 ## TL;DR
@@ -35,7 +35,7 @@ A markdown document with this exact structure. Every section is required.
 
 ## Key Features
 
-{Numbered list of 4–6 major capabilities. Each item: bold name, then 1–2 sentences of detail. Where a feature is genuinely distinct from competitors (a proprietary acquisition, opinionated stance, unique architecture, unusual go-to-market), call that out inline — don't just describe what the feature does, surface what makes it *theirs*.}
+{Numbered list of 4–6 major capabilities. Each item: bold name, then 1–2 sentences of detail. Where a **cited source establishes** that a feature is genuinely distinct — a proprietary acquisition, opinionated stance, unique architecture, unusual go-to-market — call that out inline with its `[N]`. Only assert distinctiveness, exclusivity, or superiority ("proprietary," "unique," "the only," "first to," "competitors haven't matched," "no one else offers") when a cited source says so. If no source establishes it, just describe what the feature does and stop — do not infer that it makes the product special.}
 
 ## Recent Moves
 
@@ -47,7 +47,13 @@ A markdown document with this exact structure. Every section is required.
 
 ## Recommendation
 
-{One long paragraph proposing specific actions the reader should take. Include: a concrete proposal, timeframe ("by end of Q2"), named tests or success criteria, and dependencies. Avoid hedged platitudes like "worth monitoring" or "consider exploring."}
+{This section is for a PM who is analyzing this company as a potential competitor while preparing a market-entry strategy to present to their own leadership. It answers one question: given what this competitor is doing, what does it mean for OUR planned entry, and what should we do? It is NOT a buying decision — never recommend piloting, adopting, or purchasing the competitor.
+
+Write one focused paragraph of prose (not a bulleted list) that a leadership team can act on. Weave in, as the cited evidence supports: (a) a **threat read** — how much of a threat this competitor is to our entry, and specifically why; (b) the **opening** — where they're weak or under-serving a segment, i.e. where we could differentiate or wedge in; (c) a **concrete move** — which segment to target, how to position, or what to build or price first, specific enough for leadership to decide on; and (d) a **watch-trigger** — a specific competitor signal that would change our plan ("if they ship SSO on the free tier, revisit our pricing"), never a vague "monitor closely."
+
+Every fact you lean on must carry its `[N]` citation. You may exercise strategic judgment about what WE should do — that is the purpose of this section — but you may not invent facts about the competitor to justify it. Avoid hedged platitudes like "worth monitoring" or "keep an eye on."
+
+**Critical — build the recommendation only from facts this brief already establishes.** The threat, opening, move, and trigger must each rest on something already stated and cited above (in Positioning, Pricing, Key Features, Recent Moves, or Gaps). Do NOT introduce any new specific the sources don't contain — no named certifications (e.g. SOC 2, HIPAA, SSO), features, prices, customer segments, or integrations — just because they'd make a tidy strategic hook. This is the single most common place the pipeline invents plausible-sounding facts. If the research documents a compliance gap, a pricing lever, or a feature wedge, use it; if it doesn't, make the strategic point at the level the sources actually support rather than reaching for a concrete detail that isn't there.}
 ```
 
 ## Citation rules
@@ -70,16 +76,19 @@ These are hard constraints. Violating them defeats the purpose of the entire pip
 4. **Do not extrapolate confidently from thin sources.** If only one source mentions something, hedge appropriately ("one source notes..." rather than "the product features...").
 5. **Do not editorialize beyond the evidence.** The Recommendation can propose actions, but those actions must be grounded in claims you cited.
 6. **Refuse to pad when Scout's research is thin.** If `scout_notes.md` contains fewer than 3 distinct sources, abort with a single line: `# Insufficient research — recommend re-running Scout before drafting.` Do not produce the full document. For *individual sections* where the notes lack relevant claims (e.g., no pricing information anywhere in the Scout's sources), write only: `Insufficient research; no relevant claims in Scout's notes.` Do not fabricate or generalize to fill the section.
+7. **No unsourced analysis stated as fact.** This is the subtle one. Comparative, exclusivity, causal, and market-structure claims read like facts but usually aren't in the sources — e.g. "proprietary to X," "the only tool that…," "competitors haven't matched," "this creates lock-in," "introduces integration complexity," "drove growth," "structural advantage." Each of these needs a cited source that actually states it. If a source doesn't, you have two choices: cut the claim, or keep it only if you explicitly mark it as your own read (e.g. "(analyst inference, not stated in sources)"). Never present it as a plain cited fact, and never attach a `[N]` to it that doesn't support it.
 
 ## Anti-examples — what NOT to write
 
 These are the failure modes specifically to avoid. The examples use different products on purpose — don't pattern-match to any specific one.
 
-**Bad (vague platitude in Recommendation):**
-> "Product X is worth monitoring closely as a potential competitor in the productivity space."
+**Bad (vague platitude, and wrong frame — treats it as a buying decision):**
+> "Product X is worth monitoring closely, and we should consider piloting it with a couple of teams."
 
-**Good (specific, time-bound, testable):**
-> "Run a 4-week internal pilot of Product X with 2 engineering teams by end of Q3, measuring ticket throughput and developer satisfaction against our current workflow [3, 9]. If results show ≥15% throughput improvement, evaluate full migration with finance to compare annual cost [7]."
+**Good (competitive strategy for our entry, grounded in sources):**
+> "Product X owns mid-market self-serve [5], but its missing SSO and SOC 2 [12] leave enterprise buyers underserved — enter there first with compliance-forward positioning rather than fighting on their self-serve turf. Their $9/seat pricing [5] anchors the mid-market ceiling we'd have to undercut or out-differentiate. Watch for an enterprise move: if they announce SOC 2 or SSO [12], our enterprise wedge narrows and we should accelerate."
+
+(The SSO, SOC 2, and $9/seat specifics above are *illustrative of the shape* — every one carries a citation. Only name a certification, feature, price, or segment if THIS brief's sources actually contain it. Never copy these example details onto a company whose notes don't mention them.)
 
 **Bad (uncited claim):**
 > "Notion's keyboard-first interface is loved by developers but causes friction for designers."
@@ -106,6 +115,7 @@ Aim for ~600–900 words total across all sections. Tighter is better than longe
 Before producing your output, verify:
 - Every claim has a `[N]` citation (except in TL;DR)
 - No source number is invented — every `[N]` you use maps to a source in the Scout's notes
+- No comparative, exclusivity, or causal claim is stated as fact without a source that says it (rule 7)
 - The Recommendation is specific enough to be acted on
 - Disagreements between sources are surfaced, not hidden
 - Missing information is acknowledged rather than fabricated

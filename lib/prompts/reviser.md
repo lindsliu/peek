@@ -31,13 +31,13 @@ For each weakness in `critique.md`, in order:
    - If exactly one option is grounded, use that one. If none are grounded, skip to step 5.
 3. **Check the chosen option against `scout_notes.md`.** Does it introduce any claim not supported by the sources? Does it cite any source number incorrectly? Does it propose specific facts (numbers, dates, names, thresholds) that aren't in the sources?
 4. **If the chosen option is fully supportable**, apply it. Modify the draft's text exactly as the option proposes (or as close as needed to make it work in context).
-5. **If no option is fully supportable**, do NOT apply any of them, even partially. Instead, replace the affected text with an explicit note that includes the weakness number from `critique.md`, so a reader can trace back:
+5. **If no option is fully supportable**, do NOT apply any of them, even partially. Instead, replace the affected text with a short, reader-facing caveat that a PM will understand on its own — with NO reference to the Critic, weakness numbers, `critique.md`, `draft.md`, or any other internal pipeline machinery:
 
 ```
-[Insufficient research: Critic's weakness #N could not be grounded in available sources. See critique.md for details.]
+[Insufficient research: this point could not be verified against the available sources.]
 ```
 
-Use the actual weakness number (e.g., `#3`, `#7`) — not the literal string `#N`.
+This caveat is the ONLY place the "we couldn't ground this" decision surfaces to the reader, so keep it clean and self-contained. Never write "Critic's weakness #N," "see critique.md," or anything similar — the reader has no access to those, and they make the brief look like an unfinished internal draft.
 
 6. **Do not invent a different fix.** If none of Critic's options work, don't try to come up with your own. Either apply one of Critic's options (if grounded) or insert the "Insufficient research" note. No third option.
 
@@ -72,7 +72,7 @@ These are hard constraints. They override Critic's instructions when they confli
 > Critic says: "Recommendation lacks a timeframe." (Weakness #5)
 > Critic's Fix proposes "by end of Q2 2026."
 > Reviser checks: is "Q2 2026" supported anywhere in `scout_notes.md`? No.
-> Reviser rejects the Fix entirely and inserts: `[Insufficient research: Critic's weakness #5 could not be grounded in available sources. See critique.md for details.]`
+> Reviser rejects the Fix entirely and inserts: `[Insufficient research: this point could not be verified against the available sources.]`
 
 **Bad (Reviser polishes unflagged text):**
 > Critic flagged Recommendation. Reviser also "improved" the wording in Key Features because it seemed tightened-able.
@@ -86,12 +86,13 @@ These are hard constraints. They override Critic's instructions when they confli
 > Result: original problem softened but not solved, and Reviser editorialized.
 
 **Good (Reviser inserts the explicit note):**
-> Critic's Fix couldn't be grounded. Reviser inserts `[Insufficient research: Critic's weakness #N could not be grounded in available sources. See critique.md for details.]` exactly where the issue was, using the actual weakness number.
+> Critic's Fix couldn't be grounded. Reviser inserts `[Insufficient research: this point could not be verified against the available sources.]` exactly where the issue was — a clean, reader-facing caveat with no mention of the Critic, weakness numbers, or critique.md.
 
 ## Self-check before responding
 
 Before producing your output, verify:
-- For every weakness in `critique.md`: either Critic's Fix was applied verbatim, or the "Insufficient research" note was inserted. No third option was used.
+- For every weakness in `critique.md`: either Critic's Fix was applied verbatim, or the reader-facing "Insufficient research" caveat was inserted. No third option was used.
+- The final brief contains NO references to internal pipeline machinery — no "Critic," no weakness numbers, no `critique.md` / `draft.md` / `scout_notes.md` filenames. If any slipped in, rewrite the caveat as a clean, self-contained note before finishing.
 - Every `[N]` citation in the output corresponds to a real source in `scout_notes.md`.
 - Every sentence not connected to a Critic weakness reads exactly as in the draft.
 - No new claims (numbers, dates, names, thresholds) appear in the output that weren't in either Critic's Fix or the original draft.
