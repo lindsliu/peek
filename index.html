@@ -317,6 +317,8 @@
   footer.foot .brand { font-family: var(--display); font-weight: 700; color: var(--ink); }
   footer.foot .brand .foot-eye { height: .82em; width: auto; margin-left: .12em; vertical-align: -0.08em; }
   footer.foot .sep { color: var(--border-2); }
+  footer.foot .foot-link { color: var(--brand-700); font-weight: 600; text-decoration: none; }
+  footer.foot .foot-link:hover { text-decoration: underline; }
 
   /* ---------- responsive ---------- */
   @media (max-width: 760px) {
@@ -444,6 +446,8 @@
     <span class="brand">Peek<svg class="foot-eye" viewBox="0 0 44 30" fill="none" aria-hidden="true"><path d="M3 15C9 6 35 6 41 15C35 24 9 24 3 15Z" fill="var(--brand-tint2)" stroke="var(--brand)" stroke-width="3.2" stroke-linejoin="round"/><circle cx="26.5" cy="15" r="6" fill="var(--brand)"/></svg></span>
     <span class="sep">/</span>
     <span>Four AI agents · live web search · every claim traces to a real source</span>
+    <span class="sep">/</span>
+    <a class="foot-link" href="/learnings.html">What I learned building this →</a>
   </footer>
 
 </div>

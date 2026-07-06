@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Building Peek — what I learned</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Figtree:wght@400;450;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --canvas:#f3f6f9; --surface:#ffffff; --surface-2:#f7fafc;
+    --border:#e6ebf1; --border-2:#d9e0e9;
+    --ink:#17212e; --ink-2:#55617a; --muted:#7a869a; --faint:#a2acbc;
+    --brand:#109c7a; --brand-600:#0c8465; --brand-700:#0a6f55;
+    --brand-tint:#e7f6f1; --brand-tint2:#d6efe6; --brand-ring:rgba(16,156,122,.16);
+    --r-sm:8px; --r:12px; --r-lg:16px;
+    --shadow-sm:0 1px 2px rgba(20,35,55,.05),0 1px 1px rgba(20,35,55,.04);
+    --shadow:0 2px 6px rgba(20,35,55,.05),0 12px 28px -16px rgba(20,35,55,.22);
+    --sans:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+    --display:"Bricolage Grotesque",var(--sans);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin:0; color:var(--ink); font-family:var(--sans); font-size:17px; line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    background:
+      radial-gradient(1000px 620px at 85% -12%, rgba(255,255,255,.65) 0%, rgba(255,255,255,0) 60%),
+      linear-gradient(158deg, #e6f4ee 0%, #e9f0fb 52%, #f2ecf8 100%);
+    background-attachment:fixed; min-height:100vh;
+  }
+  a { color:var(--brand-700); text-decoration:none; }
+  a:hover { text-decoration:underline; }
+  code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.88em; background:var(--surface-2); border:1px solid var(--border); padding:0 5px; border-radius:5px; color:var(--brand-700); }
+  .wrap { max-width:720px; margin:0 auto; padding:0 22px; }
+
+  /* top bar */
+  .topbar { display:flex; align-items:center; justify-content:space-between; padding:22px 0; border-bottom:1px solid var(--border); }
+  .brand { font-family:var(--display); font-weight:700; font-size:22px; color:var(--ink); display:inline-flex; align-items:center; }
+  .brand .eye { height:.66em; width:auto; margin-left:.14em; vertical-align:-0.05em; }
+  .brand:hover { text-decoration:none; }
+  .cta {
+    font-weight:600; font-size:14px; color:#fff; background:var(--brand);
+    padding:9px 16px; border-radius:100px; display:inline-flex; align-items:center; gap:7px;
+    box-shadow:0 1px 2px rgba(10,111,85,.25),0 8px 18px -10px rgba(16,156,122,.7);
+  }
+  .cta:hover { background:var(--brand-600); text-decoration:none; }
+
+  /* hero */
+  header.hero { padding:26px 0 8px; }
+  .eyebrow {
+    display:inline-flex; align-items:center; gap:8px; font-size:12.5px; font-weight:600;
+    color:var(--brand-700); background:var(--brand-tint); border:1px solid var(--brand-tint2);
+    padding:6px 12px; border-radius:100px;
+  }
+  .eyebrow .pip { width:6px; height:6px; border-radius:50%; background:var(--brand); }
+  h1 {
+    font-family:var(--display); font-size:clamp(34px,6vw,52px); font-weight:700;
+    letter-spacing:-0.02em; line-height:1.03; margin:18px 0 0; color:var(--ink);
+  }
+  .sub { font-size:19px; color:var(--ink-2); margin:16px 0 0; max-width:56ch; }
+
+  .intro { margin:30px 0 8px; font-size:18px; color:var(--ink-2); }
+  .intro b { color:var(--ink); font-weight:600; }
+
+  /* stat strip */
+  .stats {
+    display:grid; grid-template-columns:repeat(4,1fr); gap:1px; margin:28px 0;
+    background:var(--border); border:1px solid var(--border); border-radius:var(--r-lg); overflow:hidden;
+  }
+  .stat { background:var(--surface); padding:16px 14px; text-align:center; }
+  .stat .n { font-family:var(--display); font-weight:700; font-size:24px; color:var(--brand-700); }
+  .stat .l { font-size:12px; color:var(--muted); margin-top:3px; line-height:1.3; }
+
+  /* learnings */
+  .lesson { padding:26px 0; border-top:1px solid var(--border); }
+  .lesson .idx {
+    font-family:var(--display); font-weight:700; font-size:13px; color:var(--brand);
+    letter-spacing:.02em;
+  }
+  .lesson h2 {
+    font-family:var(--display); font-weight:600; font-size:23px; letter-spacing:-0.01em;
+    line-height:1.2; margin:6px 0 10px; color:var(--ink);
+  }
+  .lesson p { margin:10px 0; color:var(--ink-2); }
+  .lesson p b { color:var(--ink); font-weight:600; }
+  .lesson .aside {
+    margin-top:12px; padding:12px 16px; background:var(--surface); border:1px solid var(--border);
+    border-left:3px solid var(--brand-tint2); border-radius:var(--r-sm);
+    font-size:15.5px; color:var(--muted);
+  }
+
+  /* closer */
+  .closer {
+    margin:40px 0; padding:30px; text-align:center; background:var(--surface);
+    border:1px solid var(--border); border-radius:var(--r-lg); box-shadow:var(--shadow);
+  }
+  .closer h3 { font-family:var(--display); font-weight:600; font-size:22px; margin:0 0 8px; color:var(--ink); }
+  .closer p { color:var(--ink-2); margin:0 auto 18px; max-width:44ch; }
+
+  footer.foot {
+    border-top:1px solid var(--border); margin-top:8px; padding:22px 0 48px;
+    color:var(--muted); font-size:14px; display:flex; gap:10px 16px; align-items:center; flex-wrap:wrap;
+  }
+  footer.foot .sep { color:var(--border-2); }
+
+  /* major section headers */
+  .section { border-top:1px solid var(--border); margin-top:8px; padding-top:30px; }
+  .section-head { font-family:var(--display); font-weight:700; font-size:clamp(24px,4.4vw,32px); letter-spacing:-0.02em; margin:4px 0 6px; color:var(--ink); }
+  .section-intro { color:var(--ink-2); margin:0 0 6px; font-size:17px; }
+
+  /* architecture flow */
+  .flow { display:flex; flex-direction:column; align-items:stretch; gap:0; margin:22px 0 6px; }
+  .flow .pill { align-self:center; font-weight:600; font-size:14px; padding:9px 18px; border-radius:100px; color:#fff; }
+  .flow .pill.in { background:var(--brand); }
+  .flow .pill.out { background:var(--ink); }
+  .flow .conn { align-self:center; width:2px; height:20px; background:var(--border-2); }
+  .flow .step { display:flex; gap:14px; align-items:flex-start; background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:15px 16px; box-shadow:var(--shadow-sm); }
+  .flow .step .chip { width:40px; height:40px; border-radius:11px; background:var(--brand-tint); color:var(--brand-600); display:grid; place-items:center; flex:none; }
+  .flow .step .chip svg { width:21px; height:21px; }
+  .flow .step .num { font-size:12px; font-weight:600; color:var(--faint); }
+  .flow .step .nm { font-family:var(--display); font-weight:600; font-size:18px; margin-top:0; color:var(--ink); }
+  .flow .step .role { font-size:14.5px; color:var(--ink-2); margin-top:3px; }
+  .flow .step .out-tag { margin-top:8px; font-size:13px; color:var(--brand-700); font-weight:600; }
+  .arch-note { margin-top:16px; font-size:15px; color:var(--muted); }
+
+  /* eval rubric */
+  .rubric { border:1px solid var(--border); border-radius:var(--r-lg); overflow:hidden; margin:20px 0 6px; box-shadow:var(--shadow-sm); }
+  .rubric .row { display:flex; gap:14px; padding:14px 16px; background:var(--surface); border-top:1px solid var(--border); }
+  .rubric .row:first-child { border-top:none; }
+  .rubric .k { font-weight:600; color:var(--ink); flex:0 0 148px; }
+  .rubric .v { color:var(--ink-2); font-size:15.5px; }
+
+  /* A/B table */
+  .ab { width:100%; border-collapse:collapse; margin:18px 0 6px; font-size:16px; background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); overflow:hidden; }
+  .ab th, .ab td { padding:12px 14px; text-align:left; border-bottom:1px solid var(--border); }
+  .ab tr:last-child td { border-bottom:none; }
+  .ab thead th { font-family:var(--sans); font-size:12.5px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.04em; background:var(--surface-2); }
+  .ab td.metric { color:var(--ink-2); }
+  .ab td.n { font-variant-numeric:tabular-nums; font-weight:600; color:var(--ink); }
+  .ab td.win { color:var(--brand-700); }
+  .ab td.win::after { content:" ▲"; font-size:.7em; }
+  .takeaway { font-size:15.5px; color:var(--ink-2); margin:10px 0; }
+  .takeaway b { color:var(--ink); }
+
+  @media (max-width:560px){ .stats{ grid-template-columns:1fr 1fr; } .rubric .k{ flex-basis:110px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <a class="brand" href="/">Peek<svg class="eye" viewBox="0 0 44 30" fill="none" aria-hidden="true"><path d="M3 15C9 6 35 6 41 15C35 24 9 24 3 15Z" fill="var(--brand-tint2)" stroke="var(--brand)" stroke-width="2.6" stroke-linejoin="round"/><circle cx="26.5" cy="15" r="6.5" fill="var(--brand)"/><circle cx="23.9" cy="12.4" r="2" fill="#fff"/></svg></a>
+    <a class="cta" href="/">Try Peek
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+    </a>
+  </div>
+
+  <div class="section" style="border-top:none;padding-top:26px;">
+    <div class="section-head">How Peek works</div>
+    <p class="section-intro">Four agents, each with one job, passing work down a chain. The Scout's sources travel with the draft to every downstream agent — so faithfulness gets re-checked at every step, not just at the end.</p>
+
+    <div class="flow">
+      <div class="pill in">Company name</div>
+      <div class="conn"></div>
+
+      <div class="step">
+        <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg></div>
+        <div>
+          <div class="num">01</div>
+          <div class="nm">Scout</div>
+          <div class="role">Researches the product live with web search; keeps only grounded sources and discards SEO filler.</div>
+          <div class="out-tag">→ numbered sources + synthesis</div>
+        </div>
+      </div>
+      <div class="conn"></div>
+
+      <div class="step">
+        <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></div>
+        <div>
+          <div class="num">02</div>
+          <div class="nm">Writer</div>
+          <div class="role">Drafts a tight one-pager. Every factual claim carries a <code>[N]</code> citation back to the Scout's sources.</div>
+          <div class="out-tag">→ cited draft one-pager</div>
+        </div>
+      </div>
+      <div class="conn"></div>
+
+      <div class="step">
+        <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></div>
+        <div>
+          <div class="num">03</div>
+          <div class="nm">Critic</div>
+          <div class="role">Attacks the draft for unsupported claims, laundered citations, vague magnitudes, and weak recommendations — only specific, fixable issues.</div>
+          <div class="out-tag">→ list of concrete weaknesses</div>
+        </div>
+      </div>
+      <div class="conn"></div>
+
+      <div class="step">
+        <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+        <div>
+          <div class="num">04</div>
+          <div class="nm">Reviser</div>
+          <div class="role">Applies each fix that's grounded in the sources — and flags the ones that aren't, rather than inventing.</div>
+          <div class="out-tag">→ final brief</div>
+        </div>
+      </div>
+      <div class="conn"></div>
+      <div class="pill out">Final brief</div>
+    </div>
+
+    <p class="arch-note">The Scout's research is the single source of truth. Anything a later agent can't tie back to it doesn't make the final page — that constraint, enforced at every step, is the whole design.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-head">Measurement</div>
+    <p class="section-intro">The tool's whole promise is "faithful, cited, no hallucination" — so the eval grades exactly that. A separate model scores every brief 1–5, seeing only the brief and the Scout's sources (the same fact base the pipeline had). I ran ~10 companies through it, including deliberately thin ones and one that doesn't exist.</p>
+
+    <div class="rubric">
+      <div class="row"><div class="k">Faithfulness</div><div class="v">Does every claim trace to a cited source? No unsupported inference, no "citation laundering" (citing a source but saying more than it does).</div></div>
+      <div class="row"><div class="k">Citation accuracy</div><div class="v">Does each <code>[N]</code> point to a source that genuinely supports the exact claim?</div></div>
+      <div class="row"><div class="k">Specificity</div><div class="v">Concrete numbers and dates where the sources have them — not "many" or "popular."</div></div>
+      <div class="row"><div class="k">Recommendation</div><div class="v">A usable strategic read for a market entrant — threat, opening, move, watch-trigger — grounded in cited facts.</div></div>
+      <div class="row"><div class="k">Guardrail</div><div class="v">On thin or fake companies, does it refuse and flag rather than invent? The sharpest anti-hallucination test.</div></div>
+    </div>
+
+    <p class="arch-note">Scores are a strong signal, not gospel — so I validated the judge by hand-checking its findings against the sources before trusting it at scale.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-head">Model Comparison — Sonnet vs. Opus</div>
+    <p class="section-intro">I ran the same companies through two models, holding the Scout's research constant so the comparison isolated how each one writes, critiques, and revises from identical sources. Average scores (1–5):</p>
+
+    <table class="ab">
+      <thead>
+        <tr><th>Metric</th><th>Claude Sonnet 4.6</th><th>Claude Opus 4.8</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="metric">Faithfulness</td><td class="n">4.6</td><td class="n win">4.8</td></tr>
+        <tr><td class="metric">Citation accuracy</td><td class="n">4.7</td><td class="n win">5.0</td></tr>
+        <tr><td class="metric">Specificity</td><td class="n">5.0</td><td class="n">5.0</td></tr>
+        <tr><td class="metric">Recommendation</td><td class="n">5.0</td><td class="n">5.0</td></tr>
+        <tr><td class="metric">Overall</td><td class="n">4.6</td><td class="n win">4.9</td></tr>
+        <tr><td class="metric">Guardrail (fake company)</td><td class="n">Refused ✓</td><td class="n">Refused ✓</td></tr>
+      </tbody>
+    </table>
+
+    <p class="takeaway">Opus edges Sonnet on faithfulness and citation accuracy; both nail specificity and refuse the fake company every time. <b>The gap is small enough that the real trade-off is cost and speed, not quality</b> — Sonnet is faster and cheaper, Opus is a notch more faithful.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-head">Learnings</div>
+    <p class="section-intro">Four things that stuck with me.</p>
+  </div>
+
+  <div class="lesson">
+    <div class="idx">01</div>
+    <h2>Hallucination is real — you reduce it, you don't eliminate it</h2>
+    <p>
+      I built the pipeline specifically to stop the model from making things up: the Writer is told to
+      use only what the Scout actually found, and the Critic's whole job is to catch anything the sources
+      don't support. It still hallucinated sometimes. That was the humbling part — even with layers of
+      guardrails, you can't fully remove it. <b>What you can do is drive the odds down, and make sure that
+      when something does slip through, it's visible rather than buried.</b> Every rule, review step, and
+      eval made it rarer; none of them made it impossible. I stopped designing for "impossible" and
+      started designing for "rare, and caught."
+    </p>
+  </div>
+
+  <div class="lesson">
+    <div class="idx">02</div>
+    <h2>A PRD matters more when you build with AI, not less</h2>
+    <p>
+      AI moves fast, so it's tempting to skip the planning and just start generating. I found the
+      opposite. Writing a clear PRD — and going back and forth with the AI until we'd agreed on every
+      detail — was what held the project together from end to end. And honestly: I didn't fully
+      understand every single thing the AI proposed along the way. Nobody does. <b>The PRD was the shared
+      source of truth that kept us aimed at the same goal — even for the parts that went deeper than my
+      own expertise.</b> It's the difference between directing the work and just watching it happen.
+    </p>
+  </div>
+
+  <div class="lesson">
+    <div class="idx">03</div>
+    <h2>Send your strongest model where judgment lives</h2>
+    <p>
+      Not every step needs your most capable model. But the parts that call for real reasoning and
+      judgment — deciding whether a claim is genuinely supported, critiquing a draft, making a strategic
+      call — are where a more robust model earns its cost. My A/B test made it concrete: the two models
+      tied on the mechanical scores, and the gap opened up exactly on the faithfulness and citation
+      calls, the judgment-heavy ones. <b>Spend model capability where judgment lives, not uniformly.</b>
+    </p>
+  </div>
+
+  <div class="lesson">
+    <div class="idx">04</div>
+    <h2>Better to leave it blank than to sound good and be wrong</h2>
+    <p>
+      My instinct was that a complete brief is a better brief. It isn't. An output that says "this needs
+      more investigation" is more useful than one that fills the gap with something that sounds right but
+      isn't grounded — or a recommendation that reads well but no one can actually act on. A confident
+      answer that's wrong, or polish dressed up as insight, quietly erodes trust in everything next to it.
+      <b>A flagged blank beats a nice-sounding guess</b> — so Peek is built to leave the gap and say so.
+    </p>
+  </div>
+
+  <div class="closer">
+    <h3>See it work</h3>
+    <p>Name a product and watch the four agents research, draft, critique, and revise it live.</p>
+    <a class="cta" href="/">Try Peek
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+    </a>
+  </div>
+
+  <footer class="foot">
+    <a class="brand" href="/" style="font-size:18px;">Peek<svg class="eye" viewBox="0 0 44 30" fill="none" aria-hidden="true" style="height:.8em;vertical-align:-0.08em;"><path d="M3 15C9 6 35 6 41 15C35 24 9 24 3 15Z" fill="var(--brand-tint2)" stroke="var(--brand)" stroke-width="3.2" stroke-linejoin="round"/><circle cx="26.5" cy="15" r="6" fill="var(--brand)"/></svg></a>
+    <span class="sep">/</span>
+    <span>Built as a portfolio project. Every claim in a Peek brief traces to a real source.</span>
+  </footer>
+
+</div>
+</body>
+</html>
