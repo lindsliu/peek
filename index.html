@@ -259,6 +259,11 @@
   .md blockquote { margin: 8px 0; padding: 6px 14px; border-left: 3px solid var(--border-2); color: var(--muted); }
   .md strong { color: var(--ink); font-weight: 600; }
   .md .cite { color: var(--link); font-weight: 600; background: var(--link-tint); border-radius: 5px; padding: 0 5px; font-size: .84em; }
+  .md .cite a.cite-link { color: var(--link); font-weight: 600; cursor: pointer; text-decoration: none; }
+  .md .cite a.cite-link:hover { text-decoration: underline; }
+  .src-def { scroll-margin-top: 84px; border-radius: 6px; }
+  @keyframes citeFlash { 0%, 12% { background: var(--link-tint); box-shadow: 0 0 0 5px var(--link-tint); } 100% { background: transparent; box-shadow: 0 0 0 5px transparent; } }
+  .src-def.cite-target { animation: citeFlash 2s ease-out; }
   .md .flagnote { color: var(--warn); background: var(--warn-tint); border: 1px solid var(--warn-bd); border-radius: var(--r-sm); padding: 8px 12px; display: block; margin: 10px 0; font-size: 14px; font-weight: 500; }
   .caret::after { content: "▍"; color: var(--brand); animation: blink 1s steps(2) infinite; margin-left: 1px; }
   @keyframes blink { 0%,50% { opacity: 1; } 51%,100% { opacity: 0; } }
@@ -508,6 +513,53 @@
   var feeds = { scout: "#f-scout", writer: "#f-writer", critic: "#f-critic" };
   var lastReport = "";
 
+  // --- citation linking: brief [N] -> Scout source [N] ---
+  function anchorSources(container) {
+    if (!container) return;
+    container.querySelectorAll("p, li").forEach(function (el) {
+      var m = (el.textContent || "").match(/^\s*\[(\d+)\]/);
+      if (m) {
+        var id = "src-" + m[1];
+        if (!document.getElementById(id)) { el.id = id; el.classList.add("src-def"); }
+      }
+    });
+  }
+  function linkifyCites(container) {
+    if (!container) return;
+    container.querySelectorAll(".cite").forEach(function (sp) {
+      if (sp.dataset.linked) return;
+      var inner = sp.textContent.replace(/^\[|\]$/g, "");
+      var out = "[";
+      inner.split(/(\s*,\s*)/).forEach(function (part) {
+        if (/^\s*,\s*$/.test(part)) { out += part; return; }
+        var num = part.trim();
+        out += /^\d+$/.test(num)
+          ? '<a class="cite-link" data-src="' + num + '" title="Jump to source ' + num + ' in Scout\u2019s notes">' + num + "</a>"
+          : part;
+      });
+      out += "]";
+      sp.innerHTML = out;
+      sp.dataset.linked = "1";
+    });
+  }
+  function goToSource(n) {
+    var feed = document.querySelector("#f-scout");
+    if (!feed) return;
+    feed.classList.add("show", "open");
+    var target = document.getElementById("src-" + n);
+    if (!target) { feed.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
+    requestAnimationFrame(function () {
+      target.scrollIntoView({ behavior: "smooth", block: "center" });
+      target.classList.remove("cite-target"); void target.offsetWidth; target.classList.add("cite-target");
+    });
+  }
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest && e.target.closest(".cite-link");
+    if (!a) return;
+    e.preventDefault();
+    goToSource(a.getAttribute("data-src"));
+  });
+
   document.querySelectorAll(".chip").forEach(function (c) {
     c.addEventListener("click", function () { productEl.value = c.getAttribute("data-p"); productEl.focus(); });
   });
@@ -577,6 +629,7 @@
       var fScout = document.querySelector(feeds.scout); fScout.classList.add("show", "open");
       var scout = await runAgent("scout", { product: product }, fScout.querySelector(".md"));
       markPassed("scout"); fScout.classList.remove("open");
+      anchorSources(fScout.querySelector(".md"));
 
       var fWriter = document.querySelector(feeds.writer); fWriter.classList.add("show", "open");
       var draft = await runAgent("writer", { product: product, scoutNotes: scout }, fWriter.querySelector(".md"));
@@ -589,6 +642,7 @@
       emptyEl.style.display = "none"; reportEl.style.display = "block";
       var final = await runAgent("reviser", { scoutNotes: scout, draft: draft, critique: critique }, reportEl);
       markPassed("reviser"); lastReport = final;
+      linkifyCites(reportEl);
       actionsEl.classList.add("show");
       document.querySelector("#report-wrap").scrollIntoView({ behavior: "smooth", block: "start" });
     } catch (err) {
