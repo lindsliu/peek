@@ -313,6 +313,54 @@
   .paper .md h3 { font-size: 15.5px; color: var(--ink); }
   .paper .md hr { border: none; border-top: 1px solid var(--border); margin: 22px 0; }
 
+  /* --- claim-level feedback --- */
+  .flag-hint { display: none; align-items: center; gap: 7px; font-size: 13px; color: var(--muted); margin: -2px 0 14px; }
+  .flag-hint.show { display: flex; }
+  .flag-hint svg { width: 14px; height: 14px; color: var(--warn); flex: none; }
+  #report.flaggable-on { padding-right: 30px; }
+  #report.flaggable-on p, #report.flaggable-on li, #report.flaggable-on blockquote { position: relative; }
+  .flag-btn {
+    position: absolute; top: .12em; left: 100%; margin-left: 4px;
+    width: 22px; height: 22px; padding: 0; display: inline-flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--faint);
+    cursor: pointer; opacity: 0; transition: opacity .12s, color .12s, border-color .12s, background .12s;
+  }
+  .flag-btn svg { width: 13px; height: 13px; }
+  p:hover > .flag-btn, li:hover > .flag-btn, blockquote:hover > .flag-btn, .flag-btn:hover { opacity: 1; }
+  .flag-btn:hover { color: var(--warn); border-color: var(--warn-bd); background: var(--warn-tint); }
+  @media (hover: none) { .flag-btn { opacity: .5; } }
+  .flagged { border-left: 3px solid var(--warn-bd); background: var(--warn-tint); border-radius: 6px; padding: 3px 8px 3px 12px; margin-left: -15px; }
+  .flagged > .flag-btn { opacity: 1; color: var(--warn); border-color: var(--warn-bd); background: var(--warn-tint); }
+
+  .flag-pop {
+    position: absolute; z-index: 40; top: 100%; right: 0; margin-top: 7px; width: min(262px, 82vw);
+    background: var(--surface); border: 1px solid var(--border-2); border-radius: 12px;
+    box-shadow: var(--shadow); padding: 13px; text-align: left;
+  }
+  .flag-pop .fp-title { font-weight: 600; color: var(--ink); margin: 0 0 9px; font-size: 13.5px; }
+  .flag-pop .fp-reasons { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .flag-pop .fp-chip {
+    border: 1px solid var(--border-2); background: var(--surface-2); color: var(--ink-2);
+    border-radius: 100px; padding: 4px 10px; font-size: 12.5px; font-weight: 500; cursor: pointer;
+  }
+  .flag-pop .fp-chip.on { background: var(--warn-tint); border-color: var(--warn-bd); color: var(--warn); }
+  .flag-pop textarea {
+    width: 100%; box-sizing: border-box; border: 1px solid var(--border); border-radius: 8px;
+    padding: 7px 9px; font-family: inherit; font-size: 13px; color: var(--ink); resize: vertical; min-height: 42px; margin-bottom: 10px;
+  }
+  .flag-pop .fp-actions { display: flex; gap: 8px; justify-content: flex-end; }
+  .flag-pop .fp-btn { border-radius: 8px; padding: 6px 13px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid transparent; }
+  .flag-pop .fp-submit { background: var(--warn); color: #fff; }
+  .flag-pop .fp-submit:hover { filter: brightness(.96); }
+  .flag-pop .fp-cancel { background: transparent; color: var(--muted); border-color: var(--border); }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(12px);
+    background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 100px; font-size: 13.5px; font-weight: 500;
+    box-shadow: var(--shadow); opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 60;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
   /* ---------- footer ---------- */
   footer.foot {
     border-top: 1px solid var(--border); margin-top: 8px; padding: 22px 0 44px;
@@ -434,6 +482,10 @@
         <button class="ghost" id="copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copy</button>
         <button class="ghost" id="download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M5 21h14"/></svg>Download .md</button>
       </div>
+    </div>
+    <div class="flag-hint" id="flag-hint">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+      Spot an error? Hover any line and flag it — your flags help improve Peek.
     </div>
     <div class="paper">
       <div class="inner">
@@ -560,6 +612,83 @@
     goToSource(a.getAttribute("data-src"));
   });
 
+  // --- claim-level feedback: flag "this looks wrong" on any line of the brief ---
+  var FLAG_REASONS = ["Not in the sources", "Wrong number/date", "Misleading", "Other"];
+  var FLAG_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>';
+  var openPop = null;
+  function closePop() { if (openPop) { openPop.remove(); openPop = null; } }
+  document.addEventListener("click", function (e) {
+    if (openPop && !e.target.closest(".flag-pop") && !e.target.closest(".flag-btn")) closePop();
+  });
+  function claimText(block) {
+    var clone = block.cloneNode(true);
+    clone.querySelectorAll(".flag-btn, .flag-pop").forEach(function (n) { n.remove(); });
+    return (clone.textContent || "").trim().replace(/\s+/g, " ");
+  }
+  function addFlagAffordances(container) {
+    if (!container) return;
+    container.classList.add("flaggable-on");
+    container.querySelectorAll("p, li, blockquote").forEach(function (block) {
+      if (block.querySelector(":scope > .flag-btn")) return;
+      if ((block.textContent || "").trim().length < 8) return;
+      var btn = document.createElement("button");
+      btn.className = "flag-btn"; btn.type = "button";
+      btn.setAttribute("aria-label", "Flag this claim as wrong");
+      btn.title = "Flag this claim as wrong";
+      btn.innerHTML = FLAG_ICON;
+      btn.addEventListener("click", function (ev) {
+        ev.stopPropagation();
+        if (block.classList.contains("flagged")) { unflag(block, btn); return; }
+        openFlagPop(block, btn);
+      });
+      block.appendChild(btn);
+    });
+  }
+  function openFlagPop(block, btn) {
+    closePop();
+    var pop = document.createElement("div");
+    pop.className = "flag-pop";
+    var chips = FLAG_REASONS.map(function (r) { return '<button type="button" class="fp-chip" data-r="' + r + '">' + r + '</button>'; }).join("");
+    pop.innerHTML =
+      '<div class="fp-title">What looks wrong here?</div>' +
+      '<div class="fp-reasons">' + chips + '</div>' +
+      '<textarea placeholder="Add detail (optional)"></textarea>' +
+      '<div class="fp-actions"><button type="button" class="fp-btn fp-cancel">Cancel</button><button type="button" class="fp-btn fp-submit">Flag it</button></div>';
+    pop.addEventListener("click", function (e) { e.stopPropagation(); });
+    block.appendChild(pop); openPop = pop;
+    var chosen = null;
+    pop.querySelectorAll(".fp-chip").forEach(function (c) {
+      c.addEventListener("click", function () {
+        pop.querySelectorAll(".fp-chip").forEach(function (x) { x.classList.remove("on"); });
+        c.classList.add("on"); chosen = c.getAttribute("data-r");
+      });
+    });
+    pop.querySelector(".fp-cancel").addEventListener("click", closePop);
+    pop.querySelector(".fp-submit").addEventListener("click", function () {
+      var note = pop.querySelector("textarea").value.trim();
+      submitFlag(block, btn, chosen || "Unspecified", note);
+      closePop();
+    });
+  }
+  function submitFlag(block, btn, reason, note) {
+    block.classList.add("flagged");
+    btn.title = "Flagged — click to undo";
+    var payload = { product: (productEl.value || "").trim(), reason: reason, note: note, claim: claimText(block).slice(0, 600) };
+    fetch("/api/feedback", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) }).catch(function () {});
+    showToast("Thanks — flagged for review.");
+  }
+  function unflag(block, btn) {
+    block.classList.remove("flagged");
+    btn.title = "Flag this claim as wrong";
+    showToast("Flag removed.");
+  }
+  var toastEl = null, toastT = null;
+  function showToast(msg) {
+    if (!toastEl) { toastEl = document.createElement("div"); toastEl.className = "toast"; document.body.appendChild(toastEl); }
+    toastEl.textContent = msg; toastEl.classList.add("show");
+    clearTimeout(toastT); toastT = setTimeout(function () { toastEl.classList.remove("show"); }, 2200);
+  }
+
   document.querySelectorAll(".chip").forEach(function (c) {
     c.addEventListener("click", function () { productEl.value = c.getAttribute("data-p"); productEl.focus(); });
   });
@@ -583,6 +712,7 @@
     notice.style.display = "none"; notice.textContent = "";
     reportEl.innerHTML = ""; reportEl.style.display = "none";
     emptyEl.style.display = "block"; actionsEl.classList.remove("show"); lastReport = "";
+    var fh0 = document.getElementById("flag-hint"); if (fh0) fh0.classList.remove("show"); closePop();
     Object.keys(stages).forEach(function (n) { setStatus(n, "", "Ready"); });
     document.querySelectorAll(".stage").forEach(function (s) { s.classList.remove("passed"); });
     Object.keys(feeds).forEach(function (n) {
@@ -643,6 +773,8 @@
       var final = await runAgent("reviser", { scoutNotes: scout, draft: draft, critique: critique }, reportEl);
       markPassed("reviser"); lastReport = final;
       linkifyCites(reportEl);
+      addFlagAffordances(reportEl);
+      var fh = document.getElementById("flag-hint"); if (fh) fh.classList.add("show");
       actionsEl.classList.add("show");
       document.querySelector("#report-wrap").scrollIntoView({ behavior: "smooth", block: "start" });
     } catch (err) {
