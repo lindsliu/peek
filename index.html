@@ -766,6 +766,28 @@
   }
   function showError(msg) { notice.style.display = "block"; notice.textContent = msg; }
 
+  // --- unfindable-company detection ---
+  // Count distinct numbered sources in Scout's notes (Sources list entries like "[1] ...").
+  function countScoutSources(text) {
+    var seen = {}, m, re = /^\s*\[(\d+)\]\s/gm;
+    while ((m = re.exec(text || "")) !== null) { seen[m[1]] = 1; }
+    return Object.keys(seen).length;
+  }
+  // True only for Writer's whole-brief ABORT line — NOT per-section "insufficient" notes.
+  function isWriterAbort(text) {
+    return /insufficient research\s*[—–-]\s*recommend re-?running scout/i.test(text || "") ||
+           /^#\s*insufficient research/im.test(text || "");
+  }
+  function notFoundMessage(name) {
+    return "We couldn\u2019t find enough about \u201C" + name + "\u201D to build a brief. " +
+           "Check the spelling, or try another company.";
+  }
+  function stopUnfindable(name) {
+    resetAll();
+    showError(notFoundMessage(name));
+    productEl.focus(); productEl.select();
+  }
+
   async function runAgent(name, body, targetMd) {
     setStatus(name, "working", "Working…");
     if (targetMd) targetMd.classList.add("caret");
@@ -803,11 +825,13 @@
     try {
       var fScout = document.querySelector(feeds.scout); fScout.classList.add("show", "open");
       var scout = await runAgent("scout", { product: product }, fScout.querySelector(".md"));
+      if (countScoutSources(scout) < 3) { stopUnfindable(product); return; }
       markPassed("scout"); fScout.classList.remove("open");
       anchorSources(fScout.querySelector(".md"));
 
       var fWriter = document.querySelector(feeds.writer); fWriter.classList.add("show", "open");
       var draft = await runAgent("writer", { product: product, scoutNotes: scout }, fWriter.querySelector(".md"));
+      if (isWriterAbort(draft)) { stopUnfindable(product); return; }
       markPassed("writer"); fWriter.classList.remove("open");
 
       var fCritic = document.querySelector(feeds.critic); fCritic.classList.add("show", "open");
