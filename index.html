@@ -557,7 +557,15 @@
         html.push("<li>" + inline(line.replace(/^\s*\d+\.\s+/, "")) + "</li>"); i++; continue;
       }
       if (/^\s*---\s*$/.test(line)) { closeList(); html.push("<hr>"); i++; continue; }
-      if (/^\s*$/.test(line)) { closeList(); i++; continue; }
+      if (/^\s*$/.test(line)) {
+        if (inList) {
+          var j = i + 1;
+          while (j < lines.length && /^\s*$/.test(lines[j])) j++;
+          var nxt = lines[j] || "";
+          if ((listTag === "ul" && /^\s*[-*]\s+/.test(nxt)) || (listTag === "ol" && /^\s*\d+\.\s+/.test(nxt))) { i++; continue; }
+        }
+        closeList(); i++; continue;
+      }
       closeList(); html.push("<p>" + inline(line) + "</p>"); i++;
     }
     closeList();
