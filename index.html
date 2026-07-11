@@ -314,8 +314,14 @@
   .paper .md hr { border: none; border-top: 1px solid var(--border); margin: 22px 0; }
 
   /* --- claim-level feedback --- */
-  .flag-hint { display: none; align-items: center; gap: 7px; font-size: 13px; color: var(--muted); margin: -2px 0 14px; }
-  .flag-hint.show { display: flex; }
+  .flag-hint { display: none; }
+  .flag-hint.show {
+    display: flex; width: fit-content; align-items: center; gap: 7px;
+    position: sticky; top: 10px; z-index: 6;
+    font-size: 12.5px; font-weight: 500; color: var(--ink-2);
+    background: var(--surface); border: 1px solid var(--border); border-radius: 100px;
+    padding: 6px 13px; box-shadow: var(--shadow-sm); margin: 0 0 12px;
+  }
   .flag-hint svg { width: 14px; height: 14px; color: var(--warn); flex: none; }
   #report.flaggable-on { padding-right: 30px; }
   #report.flaggable-on p, #report.flaggable-on li, #report.flaggable-on blockquote { position: relative; }
@@ -323,7 +329,7 @@
     position: absolute; top: .12em; left: 100%; margin-left: 4px;
     width: 22px; height: 22px; padding: 0; display: inline-flex; align-items: center; justify-content: center;
     border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--faint);
-    cursor: pointer; opacity: 0; transition: opacity .12s, color .12s, border-color .12s, background .12s;
+    cursor: pointer; opacity: .3; transition: opacity .12s, color .12s, border-color .12s, background .12s;
   }
   .flag-btn svg { width: 13px; height: 13px; }
   p:hover > .flag-btn, li:hover > .flag-btn, blockquote:hover > .flag-btn, .flag-btn:hover { opacity: 1; }
@@ -333,7 +339,7 @@
   .flagged > .flag-btn { opacity: 1; color: var(--warn); border-color: var(--warn-bd); background: var(--warn-tint); }
 
   .flag-pop {
-    position: absolute; z-index: 40; top: 100%; right: 0; margin-top: 7px; width: min(262px, 82vw);
+    position: absolute; z-index: 40; top: 1.9em; right: 0; width: min(262px, 82vw);
     background: var(--surface); border: 1px solid var(--border-2); border-radius: 12px;
     box-shadow: var(--shadow); padding: 13px; text-align: left;
   }
