@@ -1,0 +1,850 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Peek — Competitive briefs in one click</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Figtree:wght@400;450;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    /* neutrals — soft, warm-cool balanced, never stark */
+    --canvas:     #f3f6f9;
+    --surface:    #ffffff;
+    --surface-2:  #f7fafc;
+    --border:     #e6ebf1;
+    --border-2:   #d9e0e9;
+    --ink:        #17212e;
+    --ink-2:      #55617a;
+    --muted:      #7a869a;
+    --faint:      #a2acbc;
+
+    /* brand — friendly teal-green */
+    --brand:      #109c7a;
+    --brand-600:  #0c8465;
+    --brand-700:  #0a6f55;
+    --brand-tint: #e7f6f1;
+    --brand-tint2:#d6efe6;
+    --brand-ring: rgba(16,156,122,.16);
+
+    /* semantic */
+    --link:       #2f6fdb;   /* citations / references */
+    --link-tint:  #eaf1fd;
+    --warn:       #a86a12;   /* "insufficient research" notes — a caution, not an error */
+    --warn-tint:  #fbefd7;
+    --warn-bd:    #eccd8a;
+    --danger:     #d94a4a;
+
+    --r-sm: 8px; --r: 12px; --r-lg: 16px;
+    --shadow-sm: 0 1px 2px rgba(20,35,55,.05), 0 1px 1px rgba(20,35,55,.04);
+    --shadow:    0 2px 6px rgba(20,35,55,.05), 0 12px 28px -16px rgba(20,35,55,.22);
+    --shadow-lg: 0 8px 20px rgba(20,35,55,.06), 0 30px 60px -34px rgba(20,35,55,.32);
+
+    --sans: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --display: "Bricolage Grotesque", var(--sans);
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    background:
+      radial-gradient(1000px 620px at 85% -12%, rgba(255,255,255,.65) 0%, rgba(255,255,255,0) 60%),
+      linear-gradient(158deg, #e6f4ee 0%, #e9f0fb 52%, #f2ecf8 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+  a { color: var(--link); }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 22px; }
+
+  /* ---------- masthead ---------- */
+  header.top { padding: 46px 0 20px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12.5px; font-weight: 600; letter-spacing: .02em;
+    color: var(--brand-700);
+    background: var(--brand-tint);
+    border: 1px solid var(--brand-tint2);
+    padding: 6px 12px; border-radius: 100px;
+  }
+  .eyebrow .pip { width: 6px; height: 6px; border-radius: 50%; background: var(--brand); }
+  h1 {
+    font-family: var(--display);
+    font-size: clamp(40px, 7vw, 62px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.0;
+    margin: 18px 0 0;
+    color: var(--ink);
+  }
+  h1 .logo-eye { height: .6em; width: auto; margin-left: .16em; vertical-align: -0.05em; }
+  .tagline {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(19px, 2.6vw, 24px);
+    letter-spacing: -0.01em;
+    margin: 12px 0 0;
+    color: var(--ink);
+  }
+  .lede { margin: 10px 0 0; max-width: 62ch; color: var(--ink-2); font-size: 16.5px; }
+  .lede b { color: var(--ink); font-weight: 600; }
+
+  /* ---------- control card ---------- */
+  .console {
+    margin-top: 26px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 20px;
+    box-shadow: var(--shadow);
+  }
+  .field-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+  .field { display: flex; flex-direction: column; gap: 7px; }
+  .field.grow { flex: 1 1 300px; }
+  .field.code { flex: 0 1 176px; }
+  label.lab { font-size: 12.5px; font-weight: 600; color: var(--ink-2); letter-spacing: .01em; }
+  input[type=text], input[type=password] {
+    background: var(--surface-2);
+    border: 1px solid var(--border-2);
+    border-radius: var(--r);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    padding: 13px 14px;
+    width: 100%;
+    transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  }
+  input::placeholder { color: var(--faint); }
+  input:focus {
+    outline: none; background: var(--surface);
+    border-color: var(--brand);
+    box-shadow: 0 0 0 4px var(--brand-ring);
+  }
+  button.run {
+    font-family: var(--sans); font-weight: 600; font-size: 15px;
+    color: #fff; background: var(--brand);
+    border: none; border-radius: var(--r);
+    padding: 13px 22px; cursor: pointer; white-space: nowrap;
+    display: inline-flex; align-items: center; gap: 9px;
+    box-shadow: 0 1px 2px rgba(10,111,85,.25), 0 8px 18px -10px rgba(16,156,122,.7);
+    transition: transform .1s ease, background .15s ease, opacity .15s ease;
+  }
+  button.run:hover { background: var(--brand-600); }
+  button.run:active { transform: translateY(1px); }
+  button.run:disabled { opacity: .55; cursor: not-allowed; box-shadow: none; }
+  button.run:focus-visible { outline: 3px solid var(--brand-ring); outline-offset: 2px; }
+  button.run svg { width: 17px; height: 17px; }
+
+  .examples { margin-top: 15px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .examples .hint { font-size: 13px; font-weight: 600; color: var(--muted); margin-right: 2px; }
+  .chip {
+    font-family: var(--sans); font-size: 13.5px; color: var(--ink-2);
+    background: var(--surface-2); border: 1px solid var(--border-2);
+    padding: 7px 13px; border-radius: 100px; cursor: pointer;
+    transition: color .15s, border-color .15s, background .15s;
+  }
+  .chip:hover { color: var(--brand-700); border-color: var(--brand-tint2); background: var(--brand-tint); }
+  .notice {
+    margin-top: 14px; font-size: 14px; color: #9a2f2f; font-weight: 500;
+    background: #fdeeee; border: 1px solid #f4d3d3; border-radius: var(--r);
+    padding: 10px 13px; display: none;
+  }
+
+  /* ---------- pipeline ---------- */
+  .section-label {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--muted); margin: 30px 0 12px;
+  }
+  .section-label::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+  .pipeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
+  .stage { position: relative; padding: 0 8px; }
+  .stage:first-child { padding-left: 0; }
+  .stage:last-child { padding-right: 0; }
+  .stage:not(:last-child)::after {
+    content: ""; position: absolute; top: 34px; right: -1px; width: 16px; height: 2px;
+    background: var(--border-2); border-radius: 2px; z-index: 2; transition: background .3s ease;
+  }
+  .stage.passed:not(:last-child)::after { background: var(--brand); }
+
+  .agent {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    min-height: 172px; height: 100%;
+    padding: 16px 16px 14px;
+    display: flex; flex-direction: column;
+    box-shadow: var(--shadow-sm);
+    transition: border-color .25s ease, box-shadow .25s ease, transform .2s ease;
+  }
+  .agent .head { display: flex; align-items: center; justify-content: space-between; }
+  .icon-chip {
+    width: 38px; height: 38px; border-radius: 11px;
+    background: var(--brand-tint); color: var(--brand-600);
+    display: grid; place-items: center;
+    transition: background .25s ease, color .25s ease;
+  }
+  .icon-chip svg { width: 20px; height: 20px; }
+  .agent .num { font-size: 12px; font-weight: 600; color: var(--faint); }
+  .agent .name { font-family: var(--display); font-weight: 600; font-size: 19px; letter-spacing: -0.01em; margin-top: 11px; }
+  .agent .role { font-size: 13px; color: var(--muted); margin-top: 4px; line-height: 1.45; }
+  .agent .status {
+    margin-top: auto; padding-top: 12px;
+    font-size: 12.5px; font-weight: 600; letter-spacing: .02em;
+    color: var(--faint); display: flex; align-items: center; gap: 8px;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--faint); flex: none; }
+
+  .agent.working {
+    border-color: var(--brand); transform: translateY(-2px);
+    box-shadow: 0 0 0 3px var(--brand-ring), var(--shadow);
+  }
+  .agent.working .icon-chip { background: var(--brand); color: #fff; }
+  .agent.working .status { color: var(--brand-600); }
+  .agent.working .dot { background: var(--brand); animation: pulse 1.15s ease-in-out infinite; }
+  .agent.done { border-color: var(--brand-tint2); }
+  .agent.done .status { color: var(--brand-600); }
+  .agent.done .dot { background: var(--brand); }
+  .agent.flag { border-color: var(--warn-bd); }
+  .agent.flag .icon-chip { background: var(--warn-tint); color: var(--warn); }
+  .agent.flag .status { color: var(--warn); }
+  .agent.flag .dot { background: var(--warn); }
+  .agent.error { border-color: #f0c4c4; }
+  .agent.error .icon-chip { background: #fdeeee; color: var(--danger); }
+  .agent.error .status { color: var(--danger); }
+  .agent.error .dot { background: var(--danger); }
+
+  @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.82); } }
+
+  /* ---------- live feeds ---------- */
+  .feeds { margin-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .feed {
+    border: 1px solid var(--border); border-radius: var(--r);
+    background: var(--surface); overflow: hidden; display: none; box-shadow: var(--shadow-sm);
+  }
+  .feed.show { display: block; }
+  .feed > .feed-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 15px; cursor: pointer; user-select: none;
+  }
+  .feed.open > .feed-head { border-bottom: 1px solid var(--border); }
+  .feed-head .ftitle { font-size: 13.5px; font-weight: 600; color: var(--ink-2); display: flex; gap: 9px; align-items: center; }
+  .feed-head .ftitle .tag {
+    font-size: 11px; font-weight: 700; color: var(--brand-600);
+    background: var(--brand-tint); border-radius: 6px; padding: 2px 6px;
+  }
+  .feed-head .chev { color: var(--faint); transition: transform .2s; display: inline-flex; }
+  .feed.open .chev { transform: rotate(90deg); }
+  .feed-body { display: none; padding: 6px 18px 18px; }
+  .feed.open .feed-body { display: block; }
+
+  /* markdown — shared */
+  .md { font-size: 15px; line-height: 1.62; color: var(--ink-2); }
+  .md h1, .md h2, .md h3 { font-family: var(--display); color: var(--ink); line-height: 1.22; }
+  .md h1 { font-size: 20px; margin: 16px 0 6px; }
+  .md h2 { font-size: 16px; margin: 18px 0 6px; }
+  .md h3 { font-size: 14px; margin: 14px 0 4px; color: var(--ink-2); }
+  .md p { margin: 8px 0; }
+  .md ul, .md ol { margin: 8px 0; padding-left: 22px; }
+  .md li { margin: 4px 0; }
+  .md code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .86em; background: var(--surface-2); border: 1px solid var(--border); padding: 1px 5px; border-radius: 5px; color: var(--brand-700); }
+  .md blockquote { margin: 8px 0; padding: 6px 14px; border-left: 3px solid var(--border-2); color: var(--muted); }
+  .md strong { color: var(--ink); font-weight: 600; }
+  .md .cite { color: var(--link); font-weight: 600; background: var(--link-tint); border-radius: 5px; padding: 0 5px; font-size: .84em; }
+  .md .cite a.cite-link { color: var(--link); font-weight: 600; cursor: pointer; text-decoration: none; }
+  .md .cite a.cite-link:hover { text-decoration: underline; }
+  .src-def { scroll-margin-top: 84px; border-radius: 6px; }
+  @keyframes citeFlash { 0%, 12% { background: var(--link-tint); box-shadow: 0 0 0 5px var(--link-tint); } 100% { background: transparent; box-shadow: 0 0 0 5px transparent; } }
+  .src-def.cite-target { animation: citeFlash 2s ease-out; }
+  .md .flagnote { color: var(--warn); background: var(--warn-tint); border: 1px solid var(--warn-bd); border-radius: var(--r-sm); padding: 8px 12px; display: block; margin: 10px 0; font-size: 14px; font-weight: 500; }
+  .caret::after { content: "▍"; color: var(--brand); animation: blink 1s steps(2) infinite; margin-left: 1px; }
+  @keyframes blink { 0%,50% { opacity: 1; } 51%,100% { opacity: 0; } }
+
+  /* ---------- the brief ---------- */
+  .report-wrap { margin: 26px 0 56px; }
+  .report-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+  .report-actions { display: none; gap: 8px; }
+  .report-actions.show { display: flex; }
+  .ghost {
+    font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--ink-2);
+    background: var(--surface); border: 1px solid var(--border-2);
+    padding: 8px 14px; border-radius: var(--r-sm); cursor: pointer;
+    display: inline-flex; align-items: center; gap: 7px;
+    transition: border-color .15s, color .15s, background .15s;
+  }
+  .ghost:hover { color: var(--brand-700); border-color: var(--brand-tint2); background: var(--brand-tint); }
+  .ghost svg { width: 15px; height: 15px; }
+
+  .paper {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+  .paper::before { content: ""; display: block; height: 4px; background: linear-gradient(90deg, var(--brand), #38c39c); }
+  .paper .inner { padding: clamp(24px, 4vw, 46px); }
+
+  /* empty state */
+  .empty { text-align: center; padding: clamp(40px, 7vw, 76px) 24px; }
+  .empty .glyph {
+    width: 56px; height: 56px; margin: 0 auto 16px; border-radius: 16px;
+    background: var(--brand-tint); color: var(--brand-600); display: grid; place-items: center;
+  }
+  .empty .glyph svg { width: 28px; height: 28px; }
+  .empty h3 { font-family: var(--display); font-weight: 600; font-size: 20px; margin: 0 0 6px; color: var(--ink); }
+  .empty p { margin: 0 auto; max-width: 46ch; color: var(--muted); font-size: 15px; }
+
+  /* report typography */
+  .paper .md { color: var(--ink-2); font-size: 16px; line-height: 1.68; }
+  .paper .md h1 { font-size: clamp(23px, 3.4vw, 30px); letter-spacing: -0.02em; margin: 0 0 2px; color: var(--ink); }
+  .paper .md h2 {
+    font-family: var(--sans); font-size: 12.5px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--brand-700); margin: 28px 0 8px; padding-bottom: 7px; border-bottom: 1px solid var(--border);
+  }
+  .paper .md h3 { font-size: 15.5px; color: var(--ink); }
+  .paper .md hr { border: none; border-top: 1px solid var(--border); margin: 22px 0; }
+
+  /* --- claim-level feedback --- */
+  .flag-hint { display: none; }
+  .flag-hint.show {
+    display: flex; width: fit-content; align-items: center; gap: 7px;
+    position: sticky; top: 10px; z-index: 6;
+    font-size: 12.5px; font-weight: 500; color: var(--ink-2);
+    background: var(--surface); border: 1px solid var(--border); border-radius: 100px;
+    padding: 6px 13px; box-shadow: var(--shadow-sm); margin: 0 0 12px;
+  }
+  .flag-hint svg { width: 14px; height: 14px; color: var(--warn); flex: none; }
+  .flag-note {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 12.5px; font-weight: 500; color: var(--ink-2);
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
+    padding: 8px 12px; margin: 14px 0 4px;
+  }
+  .flag-note svg { width: 14px; height: 14px; color: var(--warn); flex: none; }
+  #report.flaggable-on { padding-right: 30px; }
+  #report.flaggable-on p, #report.flaggable-on li, #report.flaggable-on blockquote { position: relative; }
+  .flag-btn {
+    position: absolute; top: .12em; left: 100%; margin-left: 4px;
+    width: 22px; height: 22px; padding: 0; display: inline-flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--faint);
+    cursor: pointer; opacity: .3; transition: opacity .12s, color .12s, border-color .12s, background .12s;
+  }
+  .flag-btn svg { width: 13px; height: 13px; }
+  p:hover > .flag-btn, li:hover > .flag-btn, blockquote:hover > .flag-btn, .flag-btn:hover { opacity: 1; }
+  .flag-btn:hover { color: var(--warn); border-color: var(--warn-bd); background: var(--warn-tint); }
+  @media (hover: none) { .flag-btn { opacity: .5; } }
+  .flagged { border-left: 3px solid var(--warn-bd); background: var(--warn-tint); border-radius: 6px; padding: 3px 8px 3px 12px; margin-left: -15px; }
+  .flagged > .flag-btn { opacity: 1; color: var(--warn); border-color: var(--warn-bd); background: var(--warn-tint); }
+
+  .flag-pop {
+    position: absolute; z-index: 40; top: 1.9em; right: 0; width: min(262px, 82vw);
+    background: var(--surface); border: 1px solid var(--border-2); border-radius: 12px;
+    box-shadow: var(--shadow); padding: 13px; text-align: left;
+  }
+  .flag-pop .fp-title { font-weight: 600; color: var(--ink); margin: 0 0 9px; font-size: 13.5px; }
+  .flag-pop .fp-reasons { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .flag-pop .fp-chip {
+    border: 1px solid var(--border-2); background: var(--surface-2); color: var(--ink-2);
+    border-radius: 100px; padding: 4px 10px; font-size: 12.5px; font-weight: 500; cursor: pointer;
+  }
+  .flag-pop .fp-chip.on { background: var(--warn-tint); border-color: var(--warn-bd); color: var(--warn); }
+  .flag-pop textarea {
+    width: 100%; box-sizing: border-box; border: 1px solid var(--border); border-radius: 8px;
+    padding: 7px 9px; font-family: inherit; font-size: 13px; color: var(--ink); resize: vertical; min-height: 42px; margin-bottom: 10px;
+  }
+  .flag-pop .fp-actions { display: flex; gap: 8px; justify-content: flex-end; }
+  .flag-pop .fp-btn { border-radius: 8px; padding: 6px 13px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid transparent; }
+  .flag-pop .fp-submit { background: var(--warn); color: #fff; }
+  .flag-pop .fp-submit:hover { filter: brightness(.96); }
+  .flag-pop .fp-cancel { background: transparent; color: var(--muted); border-color: var(--border); }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(12px);
+    background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 100px; font-size: 13.5px; font-weight: 500;
+    box-shadow: var(--shadow); opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 60;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ---------- footer ---------- */
+  footer.foot {
+    border-top: 1px solid var(--border); margin-top: 8px; padding: 22px 0 44px;
+    color: var(--muted); font-size: 13.5px;
+    display: flex; gap: 10px 16px; flex-wrap: wrap; align-items: center;
+  }
+  footer.foot .brand { font-family: var(--display); font-weight: 700; color: var(--ink); }
+  footer.foot .brand .foot-eye { height: .82em; width: auto; margin-left: .12em; vertical-align: -0.08em; }
+  footer.foot .sep { color: var(--border-2); }
+  footer.foot .foot-link { color: var(--brand-700); font-weight: 600; text-decoration: none; }
+  footer.foot .foot-link:hover { text-decoration: underline; }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 760px) {
+    .pipeline { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stage { padding: 0; }
+    .stage:not(:last-child)::after { display: none; }
+  }
+  @media (max-width: 440px) {
+    .pipeline { grid-template-columns: 1fr; }
+    .field.code { flex-basis: 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <span class="eyebrow"><span class="pip"></span> Competitive intelligence, automated</span>
+    <h1>Peek<svg class="logo-eye" viewBox="0 0 44 30" fill="none" aria-hidden="true"><path d="M3 15C9 6 35 6 41 15C35 24 9 24 3 15Z" fill="var(--brand-tint2)" stroke="var(--brand)" stroke-width="2.6" stroke-linejoin="round"/><circle cx="26.5" cy="15" r="6.5" fill="var(--brand)"/><circle cx="23.9" cy="12.4" r="2" fill="#fff"/></svg></h1>
+    <p class="tagline">Know any competitor in about a minute.</p>
+    <p class="lede">
+      Name a product and four AI agents take it from there — <b>Scout</b> researches it live,
+      <b>Writer</b> drafts a cited one-pager, <b>Critic</b> checks every claim, and
+      <b>Reviser</b> hands you a brief you can trust.
+    </p>
+
+    <div class="console">
+      <div class="field-row">
+        <div class="field grow">
+          <label class="lab" for="product">Product or company</label>
+          <input id="product" type="text" autocomplete="off" spellcheck="false" placeholder="e.g. Slack, Zillow, Airbnb, McDonald's…" />
+        </div>
+        <button class="run" id="run">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+          <span class="run-label">Generate brief</span>
+        </button>
+      </div>
+      <div class="examples">
+        <span class="hint">Try</span>
+        <button class="chip" data-p="Slack">Slack</button>
+        <button class="chip" data-p="Zillow">Zillow</button>
+        <button class="chip" data-p="Airbnb">Airbnb</button>
+        <button class="chip" data-p="McDonald's">McDonald's</button>
+      </div>
+      <div class="notice" id="notice"></div>
+    </div>
+  </header>
+
+  <div class="section-label">The pipeline</div>
+  <section class="pipeline" id="pipeline">
+    <div class="stage" data-stage="scout">
+      <div class="agent" id="a-scout">
+        <div class="head">
+          <span class="icon-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg></span>
+          <span class="num">01</span>
+        </div>
+        <div class="name">Scout</div>
+        <div class="role">Researches the product with live web search; keeps only grounded sources.</div>
+        <div class="status"><span class="dot"></span><span class="st">Ready</span></div>
+      </div>
+    </div>
+    <div class="stage" data-stage="writer">
+      <div class="agent" id="a-writer">
+        <div class="head">
+          <span class="icon-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></span>
+          <span class="num">02</span>
+        </div>
+        <div class="name">Writer</div>
+        <div class="role">Turns notes into a citation-backed one-pager. Every claim gets a [N].</div>
+        <div class="status"><span class="dot"></span><span class="st">Ready</span></div>
+      </div>
+    </div>
+    <div class="stage" data-stage="critic">
+      <div class="agent" id="a-critic">
+        <div class="head">
+          <span class="icon-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></span>
+          <span class="num">03</span>
+        </div>
+        <div class="name">Critic</div>
+        <div class="role">Hunts citation laundering, vague claims, and weak recommendations.</div>
+        <div class="status"><span class="dot"></span><span class="st">Ready</span></div>
+      </div>
+    </div>
+    <div class="stage" data-stage="reviser">
+      <div class="agent" id="a-reviser">
+        <div class="head">
+          <span class="icon-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/><path d="M14.5 4.5l1 1"/></svg></span>
+          <span class="num">04</span>
+        </div>
+        <div class="name">Reviser</div>
+        <div class="role">Applies only grounded fixes. Flags anything it can't back with a source.</div>
+        <div class="status"><span class="dot"></span><span class="st">Ready</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="feeds" id="feeds">
+    <div class="feed" id="f-scout"><div class="feed-head"><span class="ftitle"><span class="tag">01</span> Scout · research notes</span><span class="chev"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span></div><div class="feed-body"><div class="md"></div></div></div>
+    <div class="feed" id="f-writer"><div class="feed-head"><span class="ftitle"><span class="tag">02</span> Writer · draft one-pager</span><span class="chev"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span></div><div class="feed-body"><div class="md"></div></div></div>
+    <div class="feed" id="f-critic"><div class="feed-head"><span class="ftitle"><span class="tag">03</span> Critic · weaknesses found</span><span class="chev"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span></div><div class="feed-body"><div class="md"></div></div></div>
+  </section>
+
+  <section class="report-wrap" id="report-wrap">
+    <div class="report-bar">
+      <div class="section-label" style="margin:0;">The brief</div>
+      <div class="report-actions" id="report-actions">
+        <button class="ghost" id="copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copy</button>
+        <button class="ghost" id="download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M5 21h14"/></svg>Download .md</button>
+      </div>
+    </div>
+    <div class="flag-hint" id="flag-hint">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+      Spot an error? Hover any line and flag it — your flags help improve Peek.
+    </div>
+    <div class="paper">
+      <div class="inner">
+        <div class="empty" id="report-empty">
+          <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v5h5"/><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M9 13h6"/><path d="M9 17h4"/></svg></div>
+          <h3>Your competitive brief will appear here</h3>
+          <p>Enter a product above and hit Generate — you'll watch each agent work, then get a clean, cited one-pager.</p>
+        </div>
+        <div class="md" id="report" style="display:none;"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span class="brand">Peek<svg class="foot-eye" viewBox="0 0 44 30" fill="none" aria-hidden="true"><path d="M3 15C9 6 35 6 41 15C35 24 9 24 3 15Z" fill="var(--brand-tint2)" stroke="var(--brand)" stroke-width="3.2" stroke-linejoin="round"/><circle cx="26.5" cy="15" r="6" fill="var(--brand)"/></svg></span>
+    <span class="sep">/</span>
+    <span>Four AI agents · live web search · every claim traces to a real source</span>
+    <span class="sep">/</span>
+    <a class="foot-link" href="/learnings.html">What I learned building this →</a>
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function inline(s) {
+    s = esc(s);
+    s = s.replace(/`([^`]+)`/g, "<code>$1</code>");
+    s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+    s = s.replace(/(^|[^*])\*([^*]+)\*/g, "$1<em>$2</em>");
+    s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+    s = s.replace(/\[(\d+(?:\s*,\s*\d+)*)\]/g, '<span class="cite">[$1]</span>');
+    return s;
+  }
+  function mdToHtml(src) {
+    var lines = (src || "").replace(/\r/g, "").split("\n");
+    var html = [], i = 0, inList = false, listTag = "ul", olCounter = 0;
+    function closeList() { if (inList) { html.push("</" + listTag + ">"); inList = false; } }
+    while (i < lines.length) {
+      var line = lines[i];
+      if (/^```/.test(line)) {
+        closeList(); var buf = []; i++;
+        while (i < lines.length && !/^```/.test(lines[i])) { buf.push(lines[i]); i++; }
+        i++;
+        html.push('<pre style="white-space:pre-wrap;font-family:ui-monospace,Menlo,monospace;font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);color:var(--ink-2);padding:10px 12px;border-radius:8px;overflow:auto">' + esc(buf.join("\n")) + "</pre>");
+        continue;
+      }
+      if (/insufficient research/i.test(line) && /\[|\]/.test(line)) {
+        closeList(); html.push('<div class="flagnote">' + inline(line.replace(/^>\s?/, "")) + "</div>"); i++; continue;
+      }
+      var h = line.match(/^(#{1,3})\s+(.*)$/);
+      if (h) { closeList(); olCounter = 0; var lv = h[1].length; html.push("<h" + lv + ">" + inline(h[2]) + "</h" + lv + ">"); i++; continue; }
+      if (/^\s*>\s?/.test(line)) { closeList(); html.push("<blockquote>" + inline(line.replace(/^\s*>\s?/, "")) + "</blockquote>"); i++; continue; }
+      if (/^\s*[-*]\s+/.test(line)) {
+        if (!inList || listTag !== "ul") { closeList(); listTag = "ul"; html.push("<ul>"); inList = true; }
+        html.push("<li>" + inline(line.replace(/^\s*[-*]\s+/, "")) + "</li>"); i++; continue;
+      }
+      if (/^\s*\d+\.\s+/.test(line)) {
+        if (!inList || listTag !== "ol") { closeList(); listTag = "ol"; html.push('<ol start="' + (olCounter + 1) + '">'); inList = true; }
+        olCounter++;
+        html.push("<li>" + inline(line.replace(/^\s*\d+\.\s+/, "")) + "</li>"); i++; continue;
+      }
+      if (/^\s*---\s*$/.test(line)) { closeList(); olCounter = 0; html.push("<hr>"); i++; continue; }
+      if (/^\s*$/.test(line)) {
+        if (inList) {
+          var j = i + 1;
+          while (j < lines.length && /^\s*$/.test(lines[j])) j++;
+          var nxt = lines[j] || "";
+          if ((listTag === "ul" && /^\s*[-*]\s+/.test(nxt)) || (listTag === "ol" && /^\s*\d+\.\s+/.test(nxt))) { i++; continue; }
+        }
+        closeList(); i++; continue;
+      }
+      closeList(); html.push("<p>" + inline(line) + "</p>"); i++;
+    }
+    closeList();
+    return html.join("\n");
+  }
+
+  var $ = function (s) { return document.querySelector(s); };
+  var productEl = $("#product"), runBtn = $("#run"), notice = $("#notice");
+  var reportEl = $("#report"), emptyEl = $("#report-empty"), actionsEl = $("#report-actions");
+  var stages = { scout: "#a-scout", writer: "#a-writer", critic: "#a-critic", reviser: "#a-reviser" };
+  var feeds = { scout: "#f-scout", writer: "#f-writer", critic: "#f-critic" };
+  var lastReport = "";
+
+  // --- citation linking: brief [N] -> Scout source [N] ---
+  function anchorSources(container) {
+    if (!container) return;
+    container.querySelectorAll("p, li").forEach(function (el) {
+      var m = (el.textContent || "").match(/^\s*\[(\d+)\]/);
+      if (m) {
+        var id = "src-" + m[1];
+        if (!document.getElementById(id)) { el.id = id; el.classList.add("src-def"); }
+      }
+    });
+  }
+  function linkifyCites(container) {
+    if (!container) return;
+    container.querySelectorAll(".cite").forEach(function (sp) {
+      if (sp.dataset.linked) return;
+      var inner = sp.textContent.replace(/^\[|\]$/g, "");
+      var out = "[";
+      inner.split(/(\s*,\s*)/).forEach(function (part) {
+        if (/^\s*,\s*$/.test(part)) { out += part; return; }
+        var num = part.trim();
+        out += /^\d+$/.test(num)
+          ? '<a class="cite-link" data-src="' + num + '" title="Jump to source ' + num + ' in Scout\u2019s notes">' + num + "</a>"
+          : part;
+      });
+      out += "]";
+      sp.innerHTML = out;
+      sp.dataset.linked = "1";
+    });
+  }
+  function goToSource(n) {
+    var feed = document.querySelector("#f-scout");
+    if (!feed) return;
+    feed.classList.add("show", "open");
+    var target = document.getElementById("src-" + n);
+    if (!target) { feed.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
+    requestAnimationFrame(function () {
+      target.scrollIntoView({ behavior: "smooth", block: "center" });
+      target.classList.remove("cite-target"); void target.offsetWidth; target.classList.add("cite-target");
+    });
+  }
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest && e.target.closest(".cite-link");
+    if (!a) return;
+    e.preventDefault();
+    goToSource(a.getAttribute("data-src"));
+  });
+
+  // --- claim-level feedback: flag "this looks wrong" on any line of the brief ---
+  var FLAG_REASONS = ["Not in the sources", "Wrong number/date", "Misleading", "Other"];
+  var FLAG_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>';
+  var openPop = null;
+  function closePop() { if (openPop) { openPop.remove(); openPop = null; } }
+  document.addEventListener("click", function (e) {
+    if (openPop && !e.target.closest(".flag-pop") && !e.target.closest(".flag-btn")) closePop();
+  });
+  function claimText(block) {
+    var clone = block.cloneNode(true);
+    clone.querySelectorAll(".flag-btn, .flag-pop").forEach(function (n) { n.remove(); });
+    return (clone.textContent || "").trim().replace(/\s+/g, " ");
+  }
+  function addFlagNote(container) {
+    // Find the Recommendation heading (h1–h3, case-insensitive)
+    var heads = container.querySelectorAll("h1, h2, h3");
+    var recHead = null;
+    for (var i = 0; i < heads.length; i++) {
+      if (/recommendation/i.test(heads[i].textContent)) { recHead = heads[i]; break; }
+    }
+    var note = document.createElement("div");
+    note.className = "flag-note";
+    note.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>' +
+      "See something that doesn\u2019t look right? Hover over the line and click the flag to report it.";
+    if (recHead) {
+      // Walk to the end of the Recommendation section (next heading of same or higher level, or end)
+      var end = recHead;
+      var sib = recHead.nextElementSibling;
+      while (sib && !/^H[1-3]$/.test(sib.tagName)) { end = sib; sib = sib.nextElementSibling; }
+      end.insertAdjacentElement("afterend", note);
+    } else {
+      // Fallback: no Recommendation heading found — put the note at the end of the brief
+      container.appendChild(note);
+    }
+  }
+
+  function addFlagAffordances(container) {
+    if (!container) return;
+    container.classList.add("flaggable-on");
+    container.querySelectorAll("p, li, blockquote").forEach(function (block) {
+      if (block.querySelector(":scope > .flag-btn")) return;
+      if ((block.textContent || "").trim().length < 8) return;
+      var btn = document.createElement("button");
+      btn.className = "flag-btn"; btn.type = "button";
+      btn.setAttribute("aria-label", "Flag this claim as wrong");
+      btn.title = "Flag this claim as wrong";
+      btn.innerHTML = FLAG_ICON;
+      btn.addEventListener("click", function (ev) {
+        ev.stopPropagation();
+        if (block.classList.contains("flagged")) { unflag(block, btn); return; }
+        openFlagPop(block, btn);
+      });
+      block.appendChild(btn);
+    });
+  }
+  function openFlagPop(block, btn) {
+    closePop();
+    var pop = document.createElement("div");
+    pop.className = "flag-pop";
+    var chips = FLAG_REASONS.map(function (r) { return '<button type="button" class="fp-chip" data-r="' + r + '">' + r + '</button>'; }).join("");
+    pop.innerHTML =
+      '<div class="fp-title">What looks wrong here?</div>' +
+      '<div class="fp-reasons">' + chips + '</div>' +
+      '<textarea placeholder="Add detail (optional)"></textarea>' +
+      '<div class="fp-actions"><button type="button" class="fp-btn fp-cancel">Cancel</button><button type="button" class="fp-btn fp-submit">Flag it</button></div>';
+    pop.addEventListener("click", function (e) { e.stopPropagation(); });
+    block.appendChild(pop); openPop = pop;
+    var chosen = null;
+    pop.querySelectorAll(".fp-chip").forEach(function (c) {
+      c.addEventListener("click", function () {
+        pop.querySelectorAll(".fp-chip").forEach(function (x) { x.classList.remove("on"); });
+        c.classList.add("on"); chosen = c.getAttribute("data-r");
+      });
+    });
+    pop.querySelector(".fp-cancel").addEventListener("click", closePop);
+    pop.querySelector(".fp-submit").addEventListener("click", function () {
+      var note = pop.querySelector("textarea").value.trim();
+      submitFlag(block, btn, chosen || "Unspecified", note);
+      closePop();
+    });
+  }
+  function submitFlag(block, btn, reason, note) {
+    block.classList.add("flagged");
+    btn.title = "Flagged — click to undo";
+    var payload = { product: (productEl.value || "").trim(), reason: reason, note: note, claim: claimText(block).slice(0, 600) };
+    fetch("/api/feedback", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) }).catch(function () {});
+    showToast("Thanks — flagged for review.");
+  }
+  function unflag(block, btn) {
+    block.classList.remove("flagged");
+    btn.title = "Flag this claim as wrong";
+    showToast("Flag removed.");
+  }
+  var toastEl = null, toastT = null;
+  function showToast(msg) {
+    if (!toastEl) { toastEl = document.createElement("div"); toastEl.className = "toast"; document.body.appendChild(toastEl); }
+    toastEl.textContent = msg; toastEl.classList.add("show");
+    clearTimeout(toastT); toastT = setTimeout(function () { toastEl.classList.remove("show"); }, 2200);
+  }
+
+  document.querySelectorAll(".chip").forEach(function (c) {
+    c.addEventListener("click", function () { productEl.value = c.getAttribute("data-p"); productEl.focus(); });
+  });
+  document.querySelectorAll(".feed-head").forEach(function (h) {
+    h.addEventListener("click", function () { h.parentElement.classList.toggle("open"); });
+  });
+  productEl.addEventListener("keydown", function (e) { if (e.key === "Enter") start(); });
+  runBtn.addEventListener("click", start);
+
+  function setStatus(name, state, text) {
+    var el = document.querySelector(stages[name]);
+    el.classList.remove("working", "done", "flag", "error");
+    if (state) el.classList.add(state);
+    el.querySelector(".st").textContent = text;
+  }
+  function markPassed(name) {
+    var stage = document.querySelector('.stage[data-stage="' + name + '"]');
+    if (stage) stage.classList.add("passed");
+  }
+  function resetAll() {
+    notice.style.display = "none"; notice.textContent = "";
+    reportEl.innerHTML = ""; reportEl.style.display = "none";
+    emptyEl.style.display = "block"; actionsEl.classList.remove("show"); lastReport = "";
+    var fh0 = document.getElementById("flag-hint"); if (fh0) fh0.classList.remove("show"); closePop();
+    Object.keys(stages).forEach(function (n) { setStatus(n, "", "Ready"); });
+    document.querySelectorAll(".stage").forEach(function (s) { s.classList.remove("passed"); });
+    Object.keys(feeds).forEach(function (n) {
+      var f = document.querySelector(feeds[n]); f.classList.remove("show", "open"); f.querySelector(".md").innerHTML = "";
+    });
+  }
+  function showError(msg) { notice.style.display = "block"; notice.textContent = msg; }
+
+  async function runAgent(name, body, targetMd) {
+    setStatus(name, "working", "Working…");
+    if (targetMd) targetMd.classList.add("caret");
+    var resp = await fetch("/api/" + name, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    if (!resp.ok) {
+      var detail = "";
+      try { var j = await resp.json(); detail = j.error || JSON.stringify(j); } catch (e) { detail = "Request failed (" + resp.status + ")."; }
+      setStatus(name, "error", "Error");
+      if (targetMd) targetMd.classList.remove("caret");
+      throw new Error(detail);
+    }
+    var reader = resp.body.getReader(), dec = new TextDecoder(), text = "";
+    while (true) {
+      var r = await reader.read();
+      if (r.done) break;
+      text += dec.decode(r.value, { stream: true });
+      if (targetMd) targetMd.innerHTML = mdToHtml(text);
+    }
+    if (targetMd) { targetMd.classList.remove("caret"); targetMd.innerHTML = mdToHtml(text); }
+    var flagged = /insufficient research/i.test(text);
+    setStatus(name, flagged ? "flag" : "done", flagged ? "Flagged" : "Done");
+    return text;
+  }
+
+  async function start() {
+    var product = (productEl.value || "").trim();
+    if (!product) { showError("Enter a product name to generate a brief."); productEl.focus(); return; }
+    resetAll();
+    runBtn.disabled = true; $(".run-label").textContent = "Working…";
+
+    try {
+      var fScout = document.querySelector(feeds.scout); fScout.classList.add("show", "open");
+      var scout = await runAgent("scout", { product: product }, fScout.querySelector(".md"));
+      markPassed("scout"); fScout.classList.remove("open");
+      anchorSources(fScout.querySelector(".md"));
+
+      var fWriter = document.querySelector(feeds.writer); fWriter.classList.add("show", "open");
+      var draft = await runAgent("writer", { product: product, scoutNotes: scout }, fWriter.querySelector(".md"));
+      markPassed("writer"); fWriter.classList.remove("open");
+
+      var fCritic = document.querySelector(feeds.critic); fCritic.classList.add("show", "open");
+      var critique = await runAgent("critic", { scoutNotes: scout, draft: draft }, fCritic.querySelector(".md"));
+      markPassed("critic"); fCritic.classList.remove("open");
+
+      emptyEl.style.display = "none"; reportEl.style.display = "block";
+      var final = await runAgent("reviser", { scoutNotes: scout, draft: draft, critique: critique }, reportEl);
+      markPassed("reviser"); lastReport = final;
+      linkifyCites(reportEl);
+      addFlagAffordances(reportEl);
+      addFlagNote(reportEl);
+      var fh = document.getElementById("flag-hint"); if (fh) fh.classList.add("show");
+      actionsEl.classList.add("show");
+      document.querySelector("#report-wrap").scrollIntoView({ behavior: "smooth", block: "start" });
+    } catch (err) {
+      showError(err.message || "Something went wrong.");
+      if (!lastReport) { emptyEl.style.display = "block"; reportEl.style.display = "none"; }
+    } finally {
+      runBtn.disabled = false; $(".run-label").textContent = "Generate brief";
+    }
+  }
+
+  $("#copy").addEventListener("click", function () {
+    if (!lastReport) return;
+    navigator.clipboard.writeText(lastReport).then(function () {
+      var b = $("#copy"); var prev = b.innerHTML; b.textContent = "Copied"; setTimeout(function () { b.innerHTML = prev; }, 1400);
+    });
+  });
+  $("#download").addEventListener("click", function () {
+    if (!lastReport) return;
+    var blob = new Blob([lastReport], { type: "text/markdown" });
+    var url = URL.createObjectURL(blob), a = document.createElement("a");
+    a.href = url; a.download = ((productEl.value || "peek").trim().toLowerCase().replace(/[^a-z0-9]+/g, "-")) + "-brief.md";
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  });
+})();
+</script>
+</body>
+</html>
