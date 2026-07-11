@@ -766,6 +766,32 @@
   }
   function showError(msg) { notice.style.display = "block"; notice.textContent = msg; }
 
+  // --- unfindable-company detection ---
+  // We defer to the pipeline's own judgment: the Writer aborts with a short
+  // "Insufficient research" note when Scout returns too few real sources. That's
+  // format-independent (the model reads the notes semantically), so we detect
+  // that abort rather than trying to parse Scout's freeform output ourselves.
+  // Fires ONLY on the whole-brief abort — never on per-section "insufficient" notes,
+  // which live inside an otherwise-full (long) brief.
+  function isWriterAbort(text) {
+    var t = (text || "").trim();
+    if (/insufficient research\s*[—–-]\s*recommend re-?running scout/i.test(t)) return true;
+    if (/^#\s*insufficient research/im.test(t)) return true;
+    // Safety net: a bare abort that dropped the "#" heading is still very short.
+    // A real brief (even a thin one) runs many hundreds of chars with multiple sections.
+    if (t.length < 400 && /insufficient research/i.test(t)) return true;
+    return false;
+  }
+  function notFoundMessage(name) {
+    return "We couldn\u2019t find enough about \u201C" + name + "\u201D to build a brief. " +
+           "Check the spelling, or try another company.";
+  }
+  function stopUnfindable(name) {
+    resetAll();
+    showError(notFoundMessage(name));
+    productEl.focus(); productEl.select();
+  }
+
   async function runAgent(name, body, targetMd) {
     setStatus(name, "working", "Working…");
     if (targetMd) targetMd.classList.add("caret");
@@ -808,6 +834,7 @@
 
       var fWriter = document.querySelector(feeds.writer); fWriter.classList.add("show", "open");
       var draft = await runAgent("writer", { product: product, scoutNotes: scout }, fWriter.querySelector(".md"));
+      if (isWriterAbort(draft)) { stopUnfindable(product); return; }
       markPassed("writer"); fWriter.classList.remove("open");
 
       var fCritic = document.querySelector(feeds.critic); fCritic.classList.add("show", "open");
