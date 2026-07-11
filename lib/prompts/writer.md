@@ -49,7 +49,17 @@ A markdown document with this exact structure. Every section is required.
 
 {This section is for a PM who is analyzing this company as a potential competitor while preparing a market-entry strategy to present to their own leadership. It answers one question: given what this competitor is doing, what does it mean for OUR planned entry, and what should we do? It is NOT a buying decision — never recommend piloting, adopting, or purchasing the competitor.
 
-Write one focused paragraph of prose (not a bulleted list) that a leadership team can act on. Weave in, as the cited evidence supports: (a) a **threat read** — how much of a threat this competitor is to our entry, and specifically why; (b) the **opening** — where they're weak or under-serving a segment, i.e. where we could differentiate or wedge in; (c) a **concrete move** — which segment to target, how to position, or what to build or price first, specific enough for leadership to decide on; and (d) a **watch-trigger** — a specific competitor signal that would change our plan ("if they ship SSO on the free tier, revisit our pricing"), never a vague "monitor closely."
+Write the recommendation as **four short paragraphs of prose** (never a bulleted list) that a leadership team can act on. Output exactly four paragraphs, in this order, each separated by a blank line and each beginning with its **bold label**, so the four read as distinct, individually reviewable claims:
+
+**Threat —** how much of a threat this competitor is to our entry, and specifically why.
+
+**Opening —** where they're weak or under-serving a segment, i.e. where we could differentiate or wedge in.
+
+**Move —** a concrete move: which segment to target, how to position, or what to build or price first, specific enough for leadership to decide on.
+
+**Watch-trigger —** a specific competitor signal that would change our plan ("if they ship SSO on the free tier, revisit our pricing"), never a vague "monitor closely."
+
+Keep each paragraph to roughly two to four sentences. Do NOT merge them into a single block, and do NOT render them as bullet points — output exactly four separate paragraphs, each starting with its bold label.
 
 Every fact you lean on must carry its `[N]` citation. You may exercise strategic judgment about what WE should do — that is the purpose of this section — but you may not invent facts about the competitor to justify it. Avoid hedged platitudes like "worth monitoring" or "keep an eye on."
 
