@@ -531,7 +531,7 @@
   }
   function mdToHtml(src) {
     var lines = (src || "").replace(/\r/g, "").split("\n");
-    var html = [], i = 0, inList = false, listTag = "ul";
+    var html = [], i = 0, inList = false, listTag = "ul", olCounter = 0;
     function closeList() { if (inList) { html.push("</" + listTag + ">"); inList = false; } }
     while (i < lines.length) {
       var line = lines[i];
@@ -546,17 +546,18 @@
         closeList(); html.push('<div class="flagnote">' + inline(line.replace(/^>\s?/, "")) + "</div>"); i++; continue;
       }
       var h = line.match(/^(#{1,3})\s+(.*)$/);
-      if (h) { closeList(); var lv = h[1].length; html.push("<h" + lv + ">" + inline(h[2]) + "</h" + lv + ">"); i++; continue; }
+      if (h) { closeList(); olCounter = 0; var lv = h[1].length; html.push("<h" + lv + ">" + inline(h[2]) + "</h" + lv + ">"); i++; continue; }
       if (/^\s*>\s?/.test(line)) { closeList(); html.push("<blockquote>" + inline(line.replace(/^\s*>\s?/, "")) + "</blockquote>"); i++; continue; }
       if (/^\s*[-*]\s+/.test(line)) {
         if (!inList || listTag !== "ul") { closeList(); listTag = "ul"; html.push("<ul>"); inList = true; }
         html.push("<li>" + inline(line.replace(/^\s*[-*]\s+/, "")) + "</li>"); i++; continue;
       }
       if (/^\s*\d+\.\s+/.test(line)) {
-        if (!inList || listTag !== "ol") { closeList(); listTag = "ol"; html.push("<ol>"); inList = true; }
+        if (!inList || listTag !== "ol") { closeList(); listTag = "ol"; html.push('<ol start="' + (olCounter + 1) + '">'); inList = true; }
+        olCounter++;
         html.push("<li>" + inline(line.replace(/^\s*\d+\.\s+/, "")) + "</li>"); i++; continue;
       }
-      if (/^\s*---\s*$/.test(line)) { closeList(); html.push("<hr>"); i++; continue; }
+      if (/^\s*---\s*$/.test(line)) { closeList(); olCounter = 0; html.push("<hr>"); i++; continue; }
       if (/^\s*$/.test(line)) {
         if (inList) {
           var j = i + 1;
