@@ -323,6 +323,13 @@
     padding: 6px 13px; box-shadow: var(--shadow-sm); margin: 0 0 12px;
   }
   .flag-hint svg { width: 14px; height: 14px; color: var(--warn); flex: none; }
+  .flag-note {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 12.5px; font-weight: 500; color: var(--ink-2);
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
+    padding: 8px 12px; margin: 14px 0 4px;
+  }
+  .flag-note svg { width: 14px; height: 14px; color: var(--warn); flex: none; }
   #report.flaggable-on { padding-right: 30px; }
   #report.flaggable-on p, #report.flaggable-on li, #report.flaggable-on blockquote { position: relative; }
   .flag-btn {
@@ -409,7 +416,7 @@
       <div class="field-row">
         <div class="field grow">
           <label class="lab" for="product">Product or company</label>
-          <input id="product" type="text" autocomplete="off" spellcheck="false" placeholder="e.g. Linear, Notion, Figma, Vercel…" />
+          <input id="product" type="text" autocomplete="off" spellcheck="false" placeholder="e.g. Slack, Zillow, Airbnb, McDonald's…" />
         </div>
         <button class="run" id="run">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
@@ -418,10 +425,10 @@
       </div>
       <div class="examples">
         <span class="hint">Try</span>
-        <button class="chip" data-p="Linear">Linear</button>
-        <button class="chip" data-p="Notion">Notion</button>
-        <button class="chip" data-p="Figma">Figma</button>
-        <button class="chip" data-p="Perplexity">Perplexity</button>
+        <button class="chip" data-p="Slack">Slack</button>
+        <button class="chip" data-p="Zillow">Zillow</button>
+        <button class="chip" data-p="Airbnb">Airbnb</button>
+        <button class="chip" data-p="McDonald's">McDonald's</button>
       </div>
       <div class="notice" id="notice"></div>
     </div>
@@ -640,6 +647,29 @@
     clone.querySelectorAll(".flag-btn, .flag-pop").forEach(function (n) { n.remove(); });
     return (clone.textContent || "").trim().replace(/\s+/g, " ");
   }
+  function addFlagNote(container) {
+    // Find the Recommendation heading (h1–h3, case-insensitive)
+    var heads = container.querySelectorAll("h1, h2, h3");
+    var recHead = null;
+    for (var i = 0; i < heads.length; i++) {
+      if (/recommendation/i.test(heads[i].textContent)) { recHead = heads[i]; break; }
+    }
+    var note = document.createElement("div");
+    note.className = "flag-note";
+    note.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>' +
+      "See something that doesn\u2019t look right? Hover over the line and click the flag to report it.";
+    if (recHead) {
+      // Walk to the end of the Recommendation section (next heading of same or higher level, or end)
+      var end = recHead;
+      var sib = recHead.nextElementSibling;
+      while (sib && !/^H[1-3]$/.test(sib.tagName)) { end = sib; sib = sib.nextElementSibling; }
+      end.insertAdjacentElement("afterend", note);
+    } else {
+      // Fallback: no Recommendation heading found — put the note at the end of the brief
+      container.appendChild(note);
+    }
+  }
+
   function addFlagAffordances(container) {
     if (!container) return;
     container.classList.add("flaggable-on");
@@ -789,6 +819,7 @@
       markPassed("reviser"); lastReport = final;
       linkifyCites(reportEl);
       addFlagAffordances(reportEl);
+      addFlagNote(reportEl);
       var fh = document.getElementById("flag-hint"); if (fh) fh.classList.add("show");
       actionsEl.classList.add("show");
       document.querySelector("#report-wrap").scrollIntoView({ behavior: "smooth", block: "start" });
